@@ -1,0 +1,8 @@
+extends ../layout
+block content
+    include ../components/header
+    include form-register
+block append scripts
+    script(src="http://maps.google.com/maps/api/js?libraries=places")
+    script(src='/javascripts/organizacion/validate-register.js')
+    script(src='/javascripts/autocomplete.js')

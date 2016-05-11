@@ -1,0 +1,43 @@
+extends ../layout
+block content
+    include ../components/header
+    div(id='main-content' class='row')
+        div(class='subcontainer')
+            -active = 'suscribir problema'
+            include ../components/panel-option
+            section(class='white z-depth-1 col s12 m8 l8 panel')
+                    div.row
+                        h5(class='panel-title') Seleccion de problemas
+                        div(class='input-field container')
+                            select(name='categoria' id='categoria-suscribir')
+                                if categorias
+                                    for cat in categorias
+                                        option(value='#{cat._id}') #{cat.nombre}
+                                else
+                                    option(value='null') No hay categorias
+                    div.row
+                        form(id='problemas' class='container' method='post' action='/#{credencial.rol}/problemas/suscribir')
+                            ul(id='problemas-list')
+                                input(type='checkbox' id='hi')
+                            button(class='center btn' id="btn-suscribir-problemas") suscribir
+                    div.row
+                        h5(class='panel-title') Problemas suscritos
+                        if suscripcion.length > 0
+                            ul(class='collection collection-suscripcion')
+                                li(class='row collection-suscripcion-header')
+                                    div(class='col s4 item-header') Problema
+                                    div(class='col s4 item-header') Categoría
+                                    div(class='col s4 item-header')
+                                for problema in suscripcion
+                                    li(class='row collection-suscripcion-item')
+                                        div(class='col s4 item-value') #{problema.nombre}
+                                        div(class='col s4 item-value') #{problema.categoria.nombre}
+                                        div(class='col s4 item-option'): a(href="/#{credencial.rol}/problemas/eliminar/#{problema._id}") quitar de la lista
+                                
+                        else
+                            h5 No hay ningun dato
+block append scripts
+    if credencial.rol === "ciudadano"
+        script(src="/javascripts/ciudadano/add-problems.js")
+    else
+        script(src="/javascripts/organizacion/add-problems.js")

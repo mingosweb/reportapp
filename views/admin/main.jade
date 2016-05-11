@@ -1,0 +1,24 @@
+doctype
+html
+    head
+        title Welcome admin
+    body
+        h3 agregar categoria
+        form(id='categorias-add' action='/admin/categoria/add' method='post')
+            input(name='nombre' type='text' placeholder='categoria')
+            textarea(name='descripcion')
+            input(type='submit' value='enviar')
+        
+        h3 agregar un problema
+            form(id='problema-add' action='/admin/problema/add' method='post')
+                input(name='nombre' placeholder='nombre del problema' type='text')
+                input(name='descripcion' placeholder='descripcion del problema' type='text')
+                input(name='prioridad' placeholder='prioridad' type='number')
+                select(name='categoria')
+                    if categorias
+                        for cat in categorias
+                            option(value='#{cat._id}') #{cat.nombre}
+                    else
+                        option(value='null') No existen categorias
+                input(type='submit' value='registrar problema')
+        h3 termine

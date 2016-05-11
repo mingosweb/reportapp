@@ -1,0 +1,56 @@
+section(class='white z-depth-1 col s12 m8 l8')
+    header(class='row header-section')
+        div(class='header-container col s12 m3 l3')
+            ul(class='tabs')
+                li(class='tab col s6'): a(href='#') Recientes
+                li(class='tab col s6'): a(href='#') Populares
+        div(class='header-container col s12 m5 l5')
+            ul(class='pagination center')
+                li(class='waves-efect'): a(href='#') <
+                li(class='active'): a(href='#' class='active') 1
+                li(class='waves-efect'): a(href='#') 2
+                li(class='waves-efect'): a(href='#') 3
+                li: a(href='#') >
+        div(class='header-container col s12 m4 l4')
+            div(class='input-field')
+                select(name="categorias")
+                    option(value="categoria 1") Actos delictivos
+                    option(value="categoria 2") Medio ambiente
+                    option(value="categoria 3") Transporte
+                    option(value="categoria 3") Servicios publicos
+                    option(value="categoria 3") Salud
+    section(class='row grid-cards')
+        div(class='row row-cards')
+            if reportes
+              for rep in reportes
+                   div(class='col s12 m4 l4')
+                        div(class="card card-report")
+                            figure(class="card-image" class='card-report-container-img')
+                                img(src="/photos/#{rep.url_fotos[0]}" class='card-report-img')
+                            div(class="card-content")
+                                p: a(href='/#{credencial.nombre}/reportes/#{rep._id}/details') #{rep.titulo}
+            else
+                h5 no hay reportes
+        //
+            div(class='row row-cards')
+                div(class='col s12 m4 l4')
+                    div(class="card card-report")
+                        figure(class="card-image")
+                            img(src="/images/niegame.png")
+                            span(class="card-title") Card Title
+                        div(class="card-content")
+                            p: a(href='#') titulo del reporte hijuemadre
+                div(class='col s12 m4 l4')
+                    div(class="card card-report")
+                        figure(class="card-image")
+                            img(src="/images/niegame.png")
+                            span(class="card-title") Card Title
+                        div(class="card-content")
+                            p: a(href='#') titulo del reporte hijuemadre
+                div(class='col s12 m4 l4')
+                    div(class="card card-report")
+                        figure(class="card-image")
+                            img(src="/images/niegame.png")
+                            span(class="card-title") Card Title
+                        div(class="card-content")
+                            p: a(href='#') titulo del reporte hijuemadre

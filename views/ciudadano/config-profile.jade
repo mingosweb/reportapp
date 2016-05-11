@@ -1,0 +1,35 @@
+extends ../layout
+block content
+    include ../components/header
+    div(id='main-content' class='row')
+        div(class='subcontainer')
+            include ../components/panel-option
+            section(class='white z-depth-1 col s12 m8 l8')
+                    div.row
+                        div(class='input-field container')
+                            select(name='categoria' id='categoria-suscribir')
+                                if categorias
+                                    for cat in categorias
+                                        option(value='#{cat._id}') #{cat.nombre}
+                                else
+                                    option(value='null') No hay categorias
+                            label(for="categoria") Escoje una categoria
+                    div.row
+                        form(id='problemas' class='container')
+                            ul(id='problemas-list')
+                                input(type='checkbox' id='hi')
+                            button(class='center btn' id="btn-suscribir-problemas") suscribir
+                    div.row
+                        h6 Suscripciones
+                        ul
+                        if suscripcion.length > 0
+                            for problema in suscripcion
+                                li #{problema.nombre}
+                                    span #{problema.categoria.nombre}
+                        else
+                            h5 No hay ningun dato
+block append scripts
+    if credencial.rol === "ciudadano"
+        script(src="/javascripts/ciudadano/add-problems.js")
+    else
+        script(src="/javascripts/organizacion/add-problems.js")

@@ -1,0 +1,349 @@
+body {
+  background: rgb(242,242,242);
+    color: #1F4E79;
+}
+
+*{
+	padding: 0;
+	margin:  0;
+}
+
+a {
+  color: #00B7FF;
+}
+
+/* FORMULARIO LOGIN*/
+
+form ::-webkit-input-placeholder { 
+	color: #1F4E79;
+}
+
+form input{
+	border-bottom: 1px solid rgb(31,78,121) !important;
+}
+
+form a.form-login-btn{
+	display: block;
+	margin: auto;
+	width: 70%;
+	box-shadow: 0 0 0;
+}
+
+div.card{
+	padding: 2em;
+	margin: auto;
+}
+
+form .block-report{
+    padding: 2em;
+}
+
+#map-report{
+    height: 30em;
+    width: inherit;
+    margin: 1em;
+}
+/*
+#form-report{
+    background: #f5ffe1;
+}*/
+
+/* HEADER */
+
+a.brand-logo{
+	height: inherit;
+	display: flex !important;
+	flex-direction: row;
+}
+
+a.brand-logo img{
+	margin: auto;
+}
+
+.main-header{
+	padding: 0 1em;
+	background: rgb(31,78,121);
+}
+
+.main-header ul.right li a{
+	font-size: 1.2em;
+}
+
+#main-content{
+	margin: 0 !important;
+	padding: 0 5em;
+	padding-top: 5em;
+}
+
+#main-content-small{
+	height: 38.6em;
+	margin: 0 auto!important;
+	padding: 0 1em;
+	padding-top: 1em;
+}
+
+#main-content-stretch{
+	height: 38.6em;
+	margin: 0 !important;
+	padding: 0 1em;
+	padding-top: 2em;
+}
+
+.content-part{
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.owl-slider .item{
+    height: 30em;
+}
+
+#lista img{
+    height: 10em;
+}
+
+/* MENU MOBIL */
+
+#mobile-menu{
+	background: rgb(31,78,121);
+}
+
+#mobile-menu li a{
+	color: white;
+}
+
+#mobile-menu li:hover, #mobile-menu li.active, #mobile-menu li.active a, #mobile-menu li a:hover{
+	background: white;
+	color: rgb(31,78,121);
+	width: 100%;
+}
+
+#mobile-menu img{
+	margin-left: 2em;
+	margin-top: 2em;
+}
+
+.my-toast{
+	color: white;
+}
+
+/* CARD OPTION */
+
+.card-option{
+	display: flex;
+	align-items: center;
+	flex-direction: column;
+}
+
+.panel-option{
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-option li.active a{
+    color: white;
+    text-decoration:none;
+}
+
+@media (max-width: 768px) {
+	#main-content{
+		padding: 0 2em;
+	}
+    
+    #main-content-small{
+		padding: 0;
+	}
+
+	.content-part{
+		margin: 3em 0;
+	}
+
+	.card-option{
+		margin: 1em 0 !important;
+	}
+    
+    .owl-slider .item{
+        height: 20em;
+    }
+
+}
+
+/* DETALLES DE REPORTE */
+/*START */
+
+#slider-photo-details{
+    width: 80% !important;
+    margin: auto;
+    background: red;
+}
+
+.container-title{
+    height: inherit;
+    width: 90%;
+    margin: auto;
+    padding: 1em;
+    overflow: auto;
+}
+
+.container-title > *{
+    margin: auto 0;
+    display: inline;
+    height: inherit !important;
+}
+
+.detail-description{
+    margin: auto;
+    width: 90%;
+    padding: 1em;
+    border-left: 0.2em solid rgba(31, 78, 121, 0.86);
+}
+
+.btn-title{
+    text-decoration: none;
+    vertical-align: middle;
+    padding: 0.4em 1em;    
+    background: white;
+    color: rgba(31, 78, 121, 0.86);
+}
+
+.btn-title:hover{
+    background: rgba(31, 78, 121, 0.86);
+    color: white;
+    cursor: pointer;
+}
+
+.container-title > h5{
+    float: left;
+}
+
+.container-title > span{
+    float: right;
+}
+
+.linear-title{
+    width: 90%;
+    margin: auto;
+}
+
+.slider-photo-details.owl-slider .item{
+    height: 20em !important;
+    padding: 1em !important;
+}
+
+.slider-photo-details.owl-slider .owl-item img{
+    margin: auto;
+    height: auto;
+    max-height: 100%;
+    width: auto !important;
+}
+
+/*END   */
+
+/* LISTA DE SUSCRIPCIONES */
+
+.collection-suscripcion{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.collection-suscripcion > li{
+    margin: 0 !important;
+    padding: 0.6em 0 !important;
+    min-width: 100%;
+}
+
+.collection-suscripcion > li .item-option a{
+    color: white;
+    text-decoration: none;
+    background: rgba(31, 78, 121, 0.86);
+    padding: 0.5em;
+}
+
+.collection-suscripcion > li .item-option a:hover{
+    color: white;
+    text-decoration: none;
+    background: rgb(22, 73, 119);
+    padding: 0.5em;
+}
+
+.collection-suscripcion li.row.collection-suscripcion-header{
+    color: white !important;
+    text-align: center;
+    font-weight: bold;
+    background: rgba(31, 78, 121, 0.86);
+}
+
+.collection-suscripcion li.row.collection-suscripcion-item{
+    color: white !important;
+    text-align: center;
+    background: rgba(31, 78, 121, 0.52);
+}
+
+/* PANEL RESULTS */
+
+.panel{
+    margin: 1em auto !important;
+    background: white;
+    padding: 2em 0;
+}
+
+#problemas-list{
+    margin: 1em 0;
+}
+
+.panel .row{
+    margin: 0 auto;
+    min-height: 80%;
+    max-width: 80%;
+}
+
+.panel-title{
+    margin: 1.2em auto;
+    text-align: center;
+}
+
+header.header-section{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+header.header-section > *{
+    margin: 0;
+}
+
+.row-cards .col{
+    margin: 0.4em 0;
+}
+
+/* Estilos de cartas */
+
+.card-report{
+    padding: 0 !important;
+}
+
+.card figure{
+    margin: 0;
+    height: 12em;
+    max-width: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.card .card-report-container-img .card-report-img{
+    display: block;
+    max-width: 100%;
+    margin: auto;
+    height: auto;
+}
+
+.subcontainer{
+    height: inherit;
+    margin: auto;
+    width: 95%;
+    display: flex;
+    flex-wrap: wrap;
+}

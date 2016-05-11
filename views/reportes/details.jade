@@ -1,0 +1,22 @@
+extends ../layout
+block content
+    include ../components/header
+    div(class='subcontainer container')
+            section(class='block-report row panel')
+                div.container-title
+                    h5 Titulo del reporte
+                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Alza la voz'): i(class='fa fa-bullhorn')
+                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Eliminar'): i(class='fa fa-trash')
+                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Marcar como solucionado'): i(class='fa fa-check')
+                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Agregar una nota rapida'): i(class='fa fa-pencil-square-o')
+                hr(class='linear-title')
+                div(class='slider-photos')
+                    ul(class='container-photos')
+                        li: img(src="../photos/040105_123714.jpg", alt="")
+                div(class='detail-description')
+                    b Descripcion
+                    p.
+                         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo omnis numquam quia culpa placeat in facere                 necessitatibus, sit autem ullam suscipit tempora qui ipsum beatae reiciendis totam, laboriosam ut porro.
+block append scripts
+    script(src='/javascripts/slider-report-photos.js')
+    script(src='/javascripts/btn-title.js')

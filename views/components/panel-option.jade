@@ -1,0 +1,8 @@
+div(class='white z-depth-1 panel-option col s12 m3 l3')
+    ul.collection
+        if opciones
+            for opcion in opciones
+                if opcion.valor === active
+                    li(class='collection-item active'): a(href='#{opcion.url}') #{opcion.valor}
+                else
+                    li(class='collection-item'): a(href='#{opcion.url}') #{opcion.valor}

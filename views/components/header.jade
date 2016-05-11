@@ -1,0 +1,22 @@
+nav(class="main-header navbar-fixed")
+    div(class='nav-wrapper')		
+        a(class="brand-logo left", href="http://localhost:3000"): img(src="/images/logo.png")
+        if credencial
+            if(credencial.passport)
+                a(href="#" data-activates="mobile-menu" class="button-collapse right") menu
+                ul(class='right hide-on-med-and-down')
+                    if credencial
+                        -email = credencial.nombre
+                        -menuHeader = [{option: 'reportes', value: '/'+email},{option: 'reporteros', value: '/'+email},{option: 'configuracion', value: '/'+email+'/config'},{option: 'notificaciones', value: '/'+email},{option: 'salir', value: '/user/logout'}]
+                        for opcion in menuHeader
+                            if activeHeader === opcion.option
+                                li.active: a(href='#{opcion.value}') #{opcion.option}
+                            else
+                                li: a(href='#{opcion.value}') #{opcion.option}
+                ul(class="side-nav", id="mobile-menu")
+                    img(src="/images/logo.png" class="center")
+                    for opcion in menuHeader
+                            if activeHeader === opcion.option
+                                li.active: a(href='#{opcion.value}') #{opcion.option}
+                            else
+                                li: a(href='#{opcion.value}') #{opcion.option}
