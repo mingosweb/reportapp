@@ -11,6 +11,7 @@
     "debug": "~2.2.0",
     "express": "~4.13.1",
     "express-session": "^1.13.0",
+    "google-places-js": "^0.1.1",
     "jade": "~1.11.0",
     "mongoose": "^4.4.6",
     "morgan": "~1.6.1",
