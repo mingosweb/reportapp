@@ -11,11 +11,11 @@ var users = require('./routes/Ciudadano');
 var orgRoutes = require('./routes/organizacion.js');
 var adminRoutes = require('./routes/admin.js');
 var problemaRoutes = require('./routes/problemas.js');
+var reporteRoutes = require('./routes/reportes.js');
 
 var app = express();
 var server = require("http").Server(app);
 var io = require("socket.io")(server);
-var socketObj = null;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,36 +29,44 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(sesion({secret: '123456', resave: true, saveUninitialized: true}));
 
-
-
+// eventos de sockets.io del lado del servidor.
 io.on('connection',function(socket){
+    
     console.log("new user connected id socket: "+socket.id);
-
-    socket.on("join", function(data){
-        //data is a username
-        socket.join(data);
-        console.log("connected to room: "+data);
-        console.log(io.nsps["/"].adapter);
+    
+    //solicitud de socket
+    socket.emit('open', "ready");
+    
+    //evento que une a una sala recibe como datos la ciudad
+    socket.on('logmeroom', function(data) { 
+        if(data !== ""){
+            socket.leave(socket.id);
+            socket.join(data.room);
+        }else{
+            console.log("no hay ciudad");
+        }
     });
     
+    // evento receptor que prepara y envia una notificacion a los usuarios conectados
     socket.on("notificar",function(data){
-        console.log("Aqui vamos a enviar hacia: "+data.channel);
         io.to(data.channel).emit("recibir",{message: "Nuevo hecho en "+data.channel});
     });
     
-    /*socket.on("disconnect",function(){
-        io.close();
-    });*/
+    //evento para cuando se descconecta
+    socket.on("disconnect",function(){
+        console.log("te has desconectado io "+socket.id);
+    });
     
 });
 
 //console.log(io.nsps['/']);
 
 app.use('/', routes);
-app.use('/ciudadano', users);
+app.use('/ciudadano', users.initRouter(io));
 app.use('/organizacion', orgRoutes);
 app.use('/admin', adminRoutes);
 app.use('/problema',problemaRoutes);
+app.use('/reporte',reporteRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

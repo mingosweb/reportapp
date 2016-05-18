@@ -8,7 +8,7 @@ $("form#form-register-ciudadano").on('submit',function(i,e){
 	$.ajax({
 		type: 'get',
 		dataType: 'json',
-		url: 'http://localhost:3000/ciudadano/validate/'+nick+'/'+email,
+		url: '/ciudadano/validate/'+nick+'/'+email,
 		success: function(data){
 			if(data.exist === true){
 				alert("Aun hay datos invalidos");
@@ -24,7 +24,7 @@ $("form#form-register-ciudadano").on('submit',function(i,e){
                           var $toastContent = $('<span class="my-toast">Registro con exito! Bienvenido</span>');
                           Materialize.toast($toastContent, 3000);
                           setTimeout(function(){
-                              location.href = "http://localhost:3000/";
+                              location.href = "/";
                           },2000);
                         }
 			        },
@@ -49,7 +49,7 @@ $('form#form-register-ciudadano input#email').on('change',function(i,e){
 	$.ajax({
 		type: 'get',
 		dataType: 'json',
-		url: 'http://localhost:3000/ciudadano/validate-email/'+email,
+		url: '/ciudadano/validate-email/'+email,
 		success: function(data){
 			if(data.exist ===  true){
 				$('label#label-email').html("El email ya está registrado")
@@ -70,7 +70,7 @@ $('form#form-register-ciudadano input#nick').on('change',function(i,e){
 	$.ajax({
 		type: 'get',
 		dataType: 'json',
-		url: 'http://localhost:3000/ciudadano/validate-nick/'+nick,
+		url: '/ciudadano/validate-nick/'+nick,
 		success: function(data){
 			if(data.exist ===  true){
 				$('label#label-nick').html("El nick ya está registrado")

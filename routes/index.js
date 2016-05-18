@@ -47,7 +47,8 @@ router.post('/autenticate/:email/:password',function(req, res, next){
                 req.session.rol = "ciudadano";
                 req.session.nombre = ciudadanoss[0].email;
                 req.session.user = ciudadanoss[0];
-                res.json({exist: true, data: {ciudad: ciudadanoss[0].ciudad.nombre}});
+                console.log("entre a ciudadanos y cree sesion");
+                res.json({exist: true, data: {ciudad: ciudadanoss[0].ciudad.nombre, email: ciudadanoss[0].email}});
             }else{
                 OrganizacionMod = Organizacion.OrganizacionModel;
                 queryOrg = OrganizacionMod.find({email: req.params.email, password: req.params.password}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
@@ -61,8 +62,9 @@ router.post('/autenticate/:email/:password',function(req, res, next){
                             req.session.rol = "organizacion";
                             req.session.nombre= orgs[0].email;
                             req.session.user = orgs[0];
+                            console.log("entre a organizacion y cree sesion");
                             //mySocket.init(orgs[0].ciudad.nombre,orgs[0].email);
-                            res.json({exist: true, data: {ciudad: orgs[0].ciudad.nombre}});
+                            res.json({exist: true, data: {ciudad: orgs[0].ciudad.nombre, email: orgs[0].email}});
                         }else{
                             res.json({exist: false, message: 'Usuario y contraseña no coinciden'});
                         }
@@ -75,8 +77,9 @@ router.post('/autenticate/:email/:password',function(req, res, next){
 
 router.get('/:email',function(req, res, next){
     if(req.session.credencial === req.params.email+''+req.session.rol){
-        query = Mreporte.listarReportes(req.session.user.ciudad.nombre);
+        query = Mreporte.listarReportes(req.session.user.ciudad.nombre,0,12);
         query.exec(function(err,rep){
+            console.log(rep);
             if(err){
                 console.log(err);
             }
@@ -147,6 +150,27 @@ router.get('/:email/config',function(req, res, next){
         res.redirect('/');
     }
 });
+
+router.get('/:email/reportes/mis-reportes',function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+        query = Mreporte.reportesByUser(req.session.user._id);
+        query.exec(function(err,rep){
+            if(err){
+                res.send(err);
+            }else{
+              res.render('components/home-user',{
+                                    credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                    opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
+                                    reportes: rep,
+                                    activeHeader: "reportes",
+                                    active: "mis reportes"
+                                    });  
+            }
+        });
+    }else{
+        res.redirect("/");
+    }    
+});
     
 router.get('/:email/suscribir-ciudad',function(req, res, next){
     if(req.session.credencial === req.params.email+''+req.session.rol){
@@ -181,11 +205,14 @@ router.post('/:email/report/add', upload.array('photos',4), function(req, res, n
                 urlPhotos.push(req.files[i].filename);
             }
         }
+        var problemasArray = [];
+        problemasArray.push(req.body.problema);
         var myReport = {
             titulo: req.body.titulo,
             descripcion: req.body.descripcion,
             url_fotos: urlPhotos,
             autor: req.session.user._id,
+            problemas: problemasArray,
             ubicacion: {
                 nombre: req.session.user.ciudad.nombre,
                 lat: req.body.lat,
@@ -198,8 +225,6 @@ router.post('/:email/report/add', upload.array('photos',4), function(req, res, n
             if(err){
                 res.json({status: "ERROR"});
             }else{
-                //ioFunction.emitir(io,req.session.user.ciudad.nombre);
-                //mySocket.emit("uy",myReport.ubicacion.nombre);
                 res.redirect("/"+req.params.email);
             }
         });
@@ -208,13 +233,33 @@ router.post('/:email/report/add', upload.array('photos',4), function(req, res, n
     }
 });
     
-router.get('/:email/reportes/:id/details',function(req, res, next){
+router.get('/:email/reportes/:idrep/details',function(req, res, next){
     if(req.session.credencial === req.params.email+''+req.session.rol){
-        res.render('reportes/details',{
+        //buscamos el reporte
+        reporteMod = Mreporte.ReporteModel;
+        console.log("buscando por: "+req.params.idrep);
+        var query = reporteMod.findOne({_id: req.params.idrep}).populate({path: 'autor', select: 'nick email'}).populate({path:'problemas',select:'nombre categoria',populate: {path:'categoria', select: 'nombre'}});
+        query.exec(function(err, report){
+            if(err){
+                res.send("error en reporte: "+err);
+            }else{
+                if(report === null){
+                    res.render("reportes/report-null",{
                                                 credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
                                                 opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
-                                                activeHeader: "reportes"
-                                            }); 
+                                                activeHeader: "reportes",
+                                                reporte: report
+                                            });
+                }else{
+                    res.render('reportes/details',{
+                                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                                opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
+                                                activeHeader: "reportes",
+                                                reporte: report
+                                            });
+                }
+            }
+        });
     }else{
         res.redirect("/");
     }

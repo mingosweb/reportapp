@@ -23,11 +23,6 @@ CiudadanoSchema = new Schema({
     condecoraciones: [{type: Schema.ObjectId, ref: "Condecoracion"}]
 });
 
-CiudadanoSchema.methods.isexist = function(){
-    this.ciudad = this.ciudad+'-jiji';
-    return this.ciudad;
-}
-
 function obtenerUsuario(emailIn){
     CiudadanoModel = mongoose.model("Ciudadano",CiudadanoSchema);
     query = CiudadanoModel.find({email: emailIn}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});

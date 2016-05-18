@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var Ciudadano = require("../model/Ciudadano");
 var Mciudad = require("../model/Ciudad");
+var Mreporte = require("../model/Reporte");
 var mongoose = require("mongoose");
 var Places = require('google-places-js');
 const places = Places.create({ key: 'AIzaSyDa18XCLIQTfZ2SvblrWPbgf9jgZvuFaOk' });
@@ -9,9 +10,7 @@ const places = Places.create({ key: 'AIzaSyDa18XCLIQTfZ2SvblrWPbgf9jgZvuFaOk' })
 Sche = Ciudadano.CiudadanoSchema;
 UserMod = mongoose.model("ciudadano", Sche);
 
-router.get('/home', function(req, res, next) {
-    res.send(typeof Ciudadano.getUsuario);
-});
+function initRouter(io){
 
 router.get('/register',function(req, res, next){
 	res.render('ciudadano/adduser');
@@ -96,6 +95,71 @@ router.get('/validate-email/:email',function(req, res, next){
 
 });
 
+router.post("/reporte/:idrep/apoyar",function(req, res, next){
+    if(req.session.credencial){
+        var reporteMod = Mreporte.ReporteModel;
+        var query = reporteMod.findOne({_id: req.params.idrep, 'Napoyos' : req.session.user._id});
+        query.exec(function(err, rep){
+            if(rep == null){
+                var queryUpdate = reporteMod.findOneAndUpdate({_id: req.params.idrep},{$addToSet: {'Napoyos': req.session.user._id}});
+                queryUpdate.exec(function(err,result){
+                    if(err){
+                        res.send("hubo problemas en la consulta");
+                    }else{
+                        res.json({status: 'OK', message: 'Has enviado tu llamado de atención'});  
+                        io.to(req.session.user.ciudad.nombre).emit("apoyo",{message: req.session.user.nick+" Ha realizado un llamado de atencion", update: result.Napoyos.length+1});
+                    }
+                });
+            }else{
+                res.json({status: 'ERROR', message: "Ya has enviado tu llamado de atención"});
+            }
+        });
+    }
+});
+    
+router.post("/reporte/:idrep/eliminar",function(req, res, next){
+    if(req.session.credencial){
+        var reporteMod = Mreporte.ReporteModel;
+        var query = reporteMod.remove({_id: req.params.idrep});
+        query.exec(function(err, rep){
+            if(err){
+                res.json({status: "ERROR", message: "error al realizar consulta"});
+            }else{
+                res.json({status: "OK", message: "El reporte fue eliminado con exito", url: "/"+req.session.user.email+"/reportes/mis-reportes"});
+            }
+        });
+    }else{
+        res.redirect("/");
+    }
+});
+    
+router.post("/reporte/:idrep/solucionar",function(req, res, next){
+    if(req.session.credencial){
+        var reporteMod = Mreporte.ReporteModel;
+        var query = reporteMod.findOne({_id: req.params.idrep, estado: "Sin solucionar"});
+        query.exec(function(err,rep){
+            if(err){
+                res.json({status: "ERROR", message: "error al consultar repo"});
+            }else{
+                if(rep === null){
+                    res.json({status: "solved", message: "Ya haz solucionado este reporte"});
+                }else{
+                    var queryUpdate = reporteMod.findOneAndUpdate({_id: req.params.idrep},{$set: {'estado': "Solucionado"}});
+                    queryUpdate.exec(function(err,result){
+                        if(err){
+                            res.json({status:"ERROR", message: "error al actualizar"});
+                        }else{
+                            io.to(req.session.user.ciudad.nombre).emit("solucion",{message: "Se ha solucionado el problema: "+result.titulo, update: "Solucionado", repo: result._id});
+                        }
+                    });         
+                }
+            }
+        });
+    }else{
+        res.redirect("/");
+    }
+});
+
 router.post('/problemas/suscribir',function(req, res, next){    
     if(req.session.credencial === req.session.user.email+"ciudadano"){
             var datos = [];
@@ -161,5 +225,13 @@ router.get('/ciudades/eliminar/:placeId',function(req, res, next){
         res.send({status: 'INVALID', message: []});
     }
 });
+    
+    return router;
+    
+}
 
-module.exports = router;
+/*router.get("/yupi",function(req,res){
+    res.render("components/home-user");
+});*/
+
+module.exports.initRouter = initRouter;

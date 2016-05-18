@@ -3,20 +3,58 @@ block content
     include ../components/header
     div(class='subcontainer container')
             section(class='block-report row panel')
-                div.container-title
-                    h5 Titulo del reporte
-                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Alza la voz'): i(class='fa fa-bullhorn')
-                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Eliminar'): i(class='fa fa-trash')
-                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Marcar como solucionado'): i(class='fa fa-check')
-                    a(class='btn-title tooltip right' data-position='top' data-delay='50' data-tooltip='Agregar una nota rapida'): i(class='fa fa-pencil-square-o')
+                div.container-title.container-wrap
+                    h5 #{ reporte.titulo }
+                    div
+                        a(class='btn-title tooltip' id='btn-apoyo' data-idrep='#{reporte._id}' data-position='top' data-delay='50' data-tooltip='Alza la voz'): i(class='fa fa-bullhorn')
+                        if credencial.nombre === reporte.autor.email
+                            a(class='btn-title tooltip' data-position='top' data-delay='50' data-tooltip='Eliminar' id='btn-eliminar'): i(class='fa fa-trash')
+                        if credencial.nombre === reporte.autor.email
+                            a(class='btn-title tooltip btn-solved' data-position='top' data-delay='50' data-tooltip='Marcar como solucionado' id='btn-solucionar'): i(class='fa fa-check')
+                        if credencial.rol === "organizacion"
+                            a(class='btn-title tooltip' data-position='top' data-delay='50' data-tooltip='Agregar una nota rapida'): i(class='fa fa-pencil-square-o')
                 hr(class='linear-title')
                 div(class='slider-photos')
-                    ul(class='container-photos')
-                        li: img(src="../photos/040105_123714.jpg", alt="")
-                div(class='detail-description')
+                    ul(class='container-title' id='container-photos')
+                        if reporte.url_fotos.length > 0
+                            for foto in reporte.url_fotos
+                                li: img(src="/photos/#{foto}" class='responsive-img')
+                        else
+                            li: div NO HAY IMAGENES ASOCIADAS A ESTA FOTO
+                div(class='element-panel detail-description')
                     b Descripcion
-                    p.
-                         Lorem ipsum dolor sit amet, consectetur adipisicing elit. Illo omnis numquam quia culpa placeat in facere                 necessitatibus, sit autem ullam suscipit tempora qui ipsum beatae reiciendis totam, laboriosam ut porro.
+                    p #{ reporte.descripcion }
+            section(class='block-report row panel')
+                section(class='col s12 l6 m6')
+                    div.element-panel
+                        h5 Detalles del reporte
+                        hr(class='linear-title')
+                        div(class='panel-data element-panel')
+                            p.panel-data-item
+                                strong.left-align Fecha de publicación
+                                span.right-align #{ reporte.timestamp }
+                            p.panel-data-item
+                                strong.left-align Tipo de problema
+                                for problema in reporte.problemas
+                                    span.right-align #{problema.nombre}
+                                        label  | #{problema.categoria.nombre}
+                            p.panel-data-item
+                                strong.left-align Estado actual del reporte
+                                span(class='right-align solved' id='data#{reporte._id}') #{reporte.estado}
+                            p.panel-data-item
+                                strong.left-align Personas haciendo llamado de atención
+                                span(class='right-align apoyo' id='data#{reporte._id}') #{ reporte.Napoyos.length }
+                            p.panel-data-item
+                                strong.left-align Autor
+                                span.right-align #{ reporte.autor.nick }
+                section(class='col s12 l6 m6')
+                    div.element-panel
+                        h5 Ubicación
+                        hr(class='linear-title')
+                        div(id='map-report-result' data-lat="#{reporte.ubicacion.lat}" data-lng="#{reporte.ubicacion.lng}" class='z-depth-1')
+            
 block append scripts
     script(src='/javascripts/slider-report-photos.js')
     script(src='/javascripts/btn-title.js')
+    script(src='/javascripts/map.js')
+    script(src='/javascripts/ciudadano/btn-action-reports.js')

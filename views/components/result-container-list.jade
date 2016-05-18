@@ -1,9 +1,5 @@
 section(class='white z-depth-1 col s12 m8 l8')
     header(class='row header-section')
-        div(class='header-container col s12 m3 l3')
-            ul(class='tabs')
-                li(class='tab'): a(href='#') Recientes
-                li(class='tab'): a(href='#') Populares
         div(class='header-container col s12 m5 l5')
             if reportes
                 -totalPages = Math.ceil(reportes.length / 12)
@@ -24,15 +20,13 @@ section(class='white z-depth-1 col s12 m8 l8')
                     option(value="categoria 3") Transporte
                     option(value="categoria 3") Servicios publicos
                     option(value="categoria 3") Salud
-    section(class='row grid-cards')
-        div(class='row row-cards')
+    section(class='row')
+        div
             if reportes
               for rep in reportes
-                   div(class='col s12 m4 l4')
-                        div(class="card card-report")
-                            figure(class="card-image" class='card-report-container-img')
-                                img(src="/photos/#{rep.url_fotos[0]}" class='card-report-img')
-                            div(class="card-content")
-                                p: a(href='/#{credencial.nombre}/reportes/#{rep._id}/details') #{rep.titulo}
+                   div(class='col s12 m12 l12 report-list')
+                        h3: a(href='/#{credencial.nombre}/reportes/#{rep._id}/details') #{ rep.titulo }
+                        p #{ rep.descripcion }
+                        small Publicado el #{ rep.timestamp }
             else
                 h5 no hay reportes

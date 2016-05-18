@@ -5,7 +5,7 @@ function menuReportes(email, rol){
     if(rol === "ciudadano"){
         opciones = [
             {valor: "Todos los reportes", url:"/"+email},
-            {valor: "Mis reportes", url:"/"+email+"/mis-reportes"},
+            {valor: "Mis reportes", url:"/"+email+"/reportes/mis-reportes"},
             {valor: "Buscar reportes", url:"/"+email+"/buscar-reportes"},
             {valor: "Nuevo reporte", url:"/"+email+"/nuevo-reporte"}
         ];
@@ -43,11 +43,11 @@ function menuConfig(email, rol){
 
 function menuHead(email){
     menuHeader = [
-        {option: 'reportes', value: '/'+email},
-        {option: 'reporteros', value: '/'+email},
-        {option: 'configuracion', value: '/'+email+'/config'},
-        {option: 'notificaciones', value: '/'+email},
-        {option: 'salir', value: '/user/logout'}
+        {option: 'reportes', value: '/'+email, id: "header-option-reportes"},
+        {option: 'reporteros', value: '/'+email, id: "header-option-reporteros"},
+        {option: 'configuracion', value: '/'+email+'/config', id: "header-opcion-configuracion"},
+        {option: 'notificaciones', value: '/'+email+'/notificaciones', id: "header-opcion-notificaciones"},
+        {option: 'salir', value: '/user/logout', id: "header-opcion-logout"}
     ];
     return menuHeader;
 }

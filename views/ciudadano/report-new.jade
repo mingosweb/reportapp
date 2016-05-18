@@ -2,7 +2,7 @@ extends ../layout
 block content
     include ../components/header
     section(id='main-content-small' class='row')
-        div(class='subcontainer white z-depth-1')
+        div(class='subcontainer')
             div(class='col s12 m4 l4 panel-option hide-on-med-and-down')
                 ul(class='section table-of-contents')
                     li(class=''): a(href='#informacion-general') Informacion general
@@ -39,8 +39,8 @@ block content
                         h5 Ubica el lugar del problema
                             small(id='reportLocality')  | #{user.ciudad.nombre}
                         div(id='map-report' data-lat="#{user.ciudad.lat}" data-lng="#{user.ciudad.lng}" class='z-depth-1')
-                        input(type='hidden' name='lat' id='input-lat' value='0')
-                        input(type='hidden' name='lng' id='input-lng' value='0')
+                        input(type='hidden' name='lat' id='input-lat' value='#{user.ciudad.lat}')
+                        input(type='hidden' name='lng' id='input-lng' value='#{user.ciudad.lng}')
                     input(type='submit' value='Guardar' class='btn')
 block append scripts
     script(src='/javascripts/upload-photos.js')

@@ -4,7 +4,7 @@ $("form#form-register-organizacion").on('submit',function(i,e){
 	$.ajax({
 		type: 'get',
 		dataType: 'json',
-		url: 'http://localhost:3000/organizacion/validate/'+email,
+		url: '/organizacion/validate/'+email,
 		success: function(data){
 			if(data.exist === true){
 				alert("Aun hay datos invalidos");
@@ -20,7 +20,7 @@ $("form#form-register-organizacion").on('submit',function(i,e){
                             var $toastContent = $('<span class="my-toast">Registro con exito! Bienvenido</span>');
                             Materialize.toast($toastContent, 1000);
                             setTimeout(function(){
-                                location.href = "http://localhost:3000/";
+                                location.href = "/";
                             },1000);
                         }else{
                             alert("NO! "+data.data);
@@ -46,7 +46,7 @@ $('form#form-register-organizacion input#email-org').on('change',function(i,e){
 	$.ajax({
 		type: 'get',
 		dataType: 'json',
-		url: 'http://localhost:3000/organizacion/validate/'+email,
+		url: '/organizacion/validate/'+email,
 		success: function(data){
 			if(data.exist ===  true){
 				$('label#label-email').html("El email ya está registrado")
