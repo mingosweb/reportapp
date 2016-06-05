@@ -1,0 +1,67 @@
+extends ../layout
+block content
+    include ../components/header
+    div(class='container-margin-m')
+        div(class='row')
+            div(class='col m3 l4 s12')
+                include ../components/panel-option
+            div(class='col m7 l8 s12')
+                div(class='grid-column grid-panel' style='position: relative')
+                    div.row
+                        a(class='btn-title-dark btn-float-right' href='/#{credencial.nombre}/editar-perfil') Editar
+                        if user.urlPerfil && !user.urlPerfil
+                        div(class='avatar' style='background-image: url("../photos/#{user.urlPerfil}")')
+                        div(class='row grid-row')
+                            div(class='panel-data element-panel')
+                                        h3.title-small Informacion general
+                                        hr.linear-title
+                                        p.panel-data-item
+                                            strong.align-left Nit
+                                            -nit = (user.nit && !user.nit.empty) ? user.nit : "No agregado"
+                                            span.align-right    #{nit}
+                                        p.panel-data-item
+                                            -nombre = (user.nombre && !user.nombre.empty) ? user.nombre : "No agregado"
+                                            strong.align-left Nombre
+                                            span.align-right    #{nombre}
+                        div(class='row grid-row')
+                            div(class='panel-data element-panel')
+                                        h3.title-small Información de cuenta
+                                        hr.linear-title
+                                        p.panel-data-item
+                                            strong.align-left Email
+                                            span.align-right   #{user.email}
+                                        p.panel-data-item
+                                            -fechaReg = (user.fechaRegistro && !user.fechaRegistro.empty) ? user.fechaRegistro.toLocaleDateString() : "No agregado"
+                                            strong.align-left Fecha de registro
+                                            span.align-right    #{fechaReg}
+                                        p.panel-data-item
+                                            strong.align-left Numero de ciudades suscritas
+                                            span.align-right    #{user.suscripcionCiudad.length}
+                                        p.panel-data-item
+                                            strong.align-left Numero de problemas suscritos
+                                            span.align-right    #{user.suscripcionCategoria.length}
+                        div(class='row grid-row')
+                            div(class='panel-data element-panel')
+                                        h2.title-small Informacion de contacto
+                                        hr.linear-title
+                                        p.panel-data-item
+                                            strong.align-left Telefono
+                                            -telefono = (user.telefono && !user.telefono.empty) ? user.telefono : "No agregado"
+                                            span.align-right    #{telefono}
+                                        p.panel-data-item
+                                            strong.align-left Website
+                                            -web = (user.website && !user.website.empty) ? user.website : "No agregado"
+                                            span.align-right    #{web}
+                                        p.panel-data-item
+                                            strong.align-left dirección
+                                            -telefono = (user.direccion && !user.direccion.empty) ? user.direccion : "No agregado"
+                                            span.align-right    #{telefono}
+                                        p.panel-data-item
+                                            strong.align-left correo de contacto
+                                            -emailContacto = (user.emailContact && !user.emailContact.empty) ? user.emailContact : "No agregado"
+                                            span.align-right    #{emailContacto}
+block append scripts
+    script(src='/javascripts/pagination.js')
+    script.
+        template = "contacto";
+    script(src='/javascripts/search-peoples.js')

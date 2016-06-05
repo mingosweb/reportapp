@@ -6,7 +6,7 @@ socket.on('messages', function (data) {
 
 socket.on("apoyo",function(data){
     var idrepo = $("#btn-apoyo").attr("data-idrep");
-    var $toastContent = $('<span class="my-toast">'+data.message+'</span>');
+    var $toastContent = $('<span class="my-toast"><a href="/'+localStorage.getItem("user")+'/reportes/'+data.reporte+'/details">'+data.message.descripcion+'</a></span>');
         setTimeout(function(){
             Materialize.toast($toastContent, 3000);
         },500);
@@ -17,7 +17,7 @@ socket.on("apoyo",function(data){
 
 socket.on("solucion",function(data){
     var idrepo = data.repo;
-    var $toastContent = $('<span class="my-toast">'+data.message+'</span>');
+    var $toastContent = $('<span class="my-toast"><a href="/'+localStorage.getItem("user")+'/reportes/'+data.repo+'/details">'+data.message.descripcion+'</a></span>');
         setTimeout(function(){
             Materialize.toast($toastContent, 3000);
         },500);
@@ -27,12 +27,20 @@ socket.on("solucion",function(data){
 });
 
 socket.on('open', function(){
-    if(localStorage.getItem("ciudad") !== null ){
-      ciudad = localStorage.getItem("ciudad");
-      socket.emit('logmeroom',{room : ciudad });   
+    if(localStorage.getItem("salas") !== null ){
+      misSalas = JSON.parse(localStorage.getItem("salas"));
+      for(i=0; i< misSalas.length; i++){
+        console.log("unir a la sala: "+misSalas[i]);
+       socket.emit('logmeroom',{salas : misSalas[i] });      
+      }
     }else{
         console.log("jaja no me uno");
     }
+});
+
+// cuando saga de la sesion borra localstorag
+socket.on("salir",function(){
+    localStorage.clear();
 });
 
 $("#form-report").on('submit',function(i,e){
@@ -44,9 +52,13 @@ $("#mobile-menu").on("click", ".header-opcion-logout", function(){
     localStorage.clear();
 });
 
+$(".nav-wrapper .header-opcion-logout").on("click",function(){
+    localStorage.clear();
+});
+
 socket.on('recibir', function(socketData){
-    var $toastContent = $('<span class="my-toast">'+socketData.message+'</span>');
+    var $toastContent = $('<span class="my-toast"><a href="/'+localStorage.getItem("user")+'/reportes/'+socketData.repo+'/details">'+socketData.message.descripcion+'</a></span>');
     setTimeout(function(){
         Materialize.toast($toastContent, 3000);
-    },2000);
+    },500);
 });

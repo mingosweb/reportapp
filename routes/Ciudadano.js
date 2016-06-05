@@ -1,11 +1,25 @@
 var express = require('express');
 var router = express.Router();
 var Ciudadano = require("../model/Ciudadano");
+var Organizacion = require("../model/Organizacion");
 var Mciudad = require("../model/Ciudad");
 var Mreporte = require("../model/Reporte");
+var Mnotify = require("../model/Notificacion");
 var mongoose = require("mongoose");
 var Places = require('google-places-js');
+var multer = require("multer");
 const places = Places.create({ key: 'AIzaSyDa18XCLIQTfZ2SvblrWPbgf9jgZvuFaOk' });
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/photos')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+});
+
+var upload = multer({ storage: storage });
 
 Sche = Ciudadano.CiudadanoSchema;
 UserMod = mongoose.model("ciudadano", Sche);
@@ -30,6 +44,7 @@ router.post('/add',function(req, res, next){
         ciudadanoObj = new UserMod();
         ciudadanoObj.nick = req.body.nick;
         ciudadanoObj.email = req.body.email;
+        ciudadanoObj.suscripcionCiudad.push(ciudadIns);
         ciudadanoObj.password = req.body.password;
         ciudadanoObj.ciudad = ciudadIns;
         ciudadanoObj.save(function(err,ciudadanos){
@@ -43,6 +58,40 @@ router.post('/add',function(req, res, next){
       console.log(err); 
         res.json({status: "NO"});
     });
+});
+    
+router.post('/edit-profile',upload.single('urlPerfil'),function(req, res, next){
+    if(req.session.credencial === req.session.user.email+""+req.session.rol){
+        var keysObj = Object.keys(req.body);
+        objUpdate = {};
+        console.log(keysObj);
+        for (i=0; i<keysObj.length; i++){
+            if(req.body[keysObj[i]]){
+                objUpdate[keysObj[i]] = req.body[keysObj[i]];   
+            }
+        }
+        if(req.file){
+            objUpdate["urlPerfil"] = req.file.filename;
+        }
+        console.log("Actualizacion");
+        console.log(objUpdate);
+        if(req.session.rol === "ciudadano"){
+            ciudadanoMod = Ciudadano.CiudadanoModel;
+            queryUp = ciudadanoMod.findOneAndUpdate({_id: req.session.user._id},objUpdate);   
+        }else{
+            orgMod = Organizacion.OrganizacionModel;
+            queryUp = orgMod.findOneAndUpdate({_id: req.session.user._id},objUpdate);  
+        }
+        queryUp.exec(function(err,ciu){
+            if(err){
+                res.send("ocurrió un error al guardar los cambios");
+            }else{
+                res.redirect("/"+req.session.nombre+"/perfil");
+            }
+        });
+    }else{
+        res.json({status: "ERROR", message: "No se pudo realizar la operacion campo vacio"});
+    }
 });
 
 router.get('/validate/:nick/:email',function(req, res, next){
@@ -95,6 +144,182 @@ router.get('/validate-email/:email',function(req, res, next){
 
 });
 
+router.post("/personaremove", function(req, res, next){
+    if(req.session.credencial === req.session.user.email+''+req.session.rol){
+        var id_contacto = (!req.body.idpersona.empty) ? req.body.idpersona : "";
+        // si el usuario es CIUDADANO usar el modelo ciudadano
+        if(req.session.rol === "ciudadano"){
+            ciudadanoMod = Ciudadano.CiudadanoModel;
+            querycontact = ciudadanoMod.findOne({
+                $and: [
+                       {_id: req.session.user._id},
+                       {$or: [{'contactosCiudadanos': id_contacto},{'contactosOrganizaciones': id_contacto}]}
+                      ]});
+            querycontact.exec(function(err,contact){
+                // si EXISTE el contacto
+                if(contact !== null){
+                    if(req.body.rol === "ciudadano"){
+                        // si el contacto es CIUDADANO eliminar de lista de ciudadanos
+                        var query = ciudadanoMod.findOneAndUpdate({_id: req.session.user._id},{$pull: {'contactosCiudadanos': id_contacto}});
+                    }else{
+                        // si el contacto es ORGANIZACION eliminar de organizacion
+                        var query = ciudadanoMod.findOneAndUpdate({_id: req.session.user._id},{$pull: {'contactosOrganizaciones': id_contacto}});
+                    }
+                    query.exec(function(err,ciudada){
+                       if(err){
+                           res.json({status: "ERROR", message: "Paso algo en la consulta"});
+                       }else{
+                           res.json({status: "OK", message: "Se ha Eliminado de tus contactos"});
+                       }
+                    });
+                }
+                //si NO existe
+                else{
+                    res.json({status: "ERROR", message: "Este contacto no ha sido Agregado a tu lista"});
+                }
+            });
+        }
+        // si el usuario es CIUDADANO usar el modelo ciudadano
+        else if(req.session.rol === "organización"){
+            orgMod = Organizacion.CiudadanoModel;
+            querycontact = orgMod.findOne({
+                $and: [
+                       {_id: req.session.user._id},
+                       {$or: [{'contactosCiudadanos': id_contacto},{'contactosOrganizaciones': id_contacto}]}
+                      ]});
+            querycontact.exec(function(err,contact){
+                // si EXISTE el contacto
+                if(contact !== null){
+                    if(req.body.rol === "ciudadano"){
+                        // si el contacto es CIUDADANO eliminar de lista de ciudadanos
+                        var query = orgMod.findOneAndUpdate({_id: req.session.user._id},{$pull: {'contactosCiudadanos': id_contacto}});
+                    }else{
+                        // si el contacto es ORGANIZACION eliminar de organizacion
+                        var query = orgMod.findOneAndUpdate({_id: req.session.user._id},{$pull: {'contactosOrganizaciones': id_contacto}});
+                    }
+                    query.exec(function(err,org){
+                       if(err){
+                           res.json({status: "ERROR", message: "Paso algo en la consulta"});
+                       }else{
+                           res.json({status: "OK", message: "Se ha Eliminado de tus contactos"});
+                       }
+                    });
+                }
+                //si NO existe
+                else{
+                    res.json({status: "ERROR", message: "Este contacto no ha sido Agregado a tu lista"});
+                }
+            });
+        }
+    }else{
+        res.json({status: "ERROR", message: "INVALIDO"});
+    }
+});
+    
+router.post('/personaadd',function(req, res, next){
+    if(req.session.credencial === req.session.user.email+''+req.session.rol){
+        var id_contacto = (!req.body.idpersona.empty) ? req.body.idpersona : "";
+        if(req.session.rol === "ciudadano"){
+            ciudadanoMod = Ciudadano.CiudadanoModel;
+            // query que devuelve la lista de contactos del usuario si el contact existe
+            var query1 = ciudadanoMod.findOne({
+                $and: [
+                       {_id: req.session.user._id},
+                       {$or: [{'contactosCiudadanos': id_contacto},{'contactosOrganizaciones': id_contacto}]}
+                      ]});
+            query1.exec(function(err,ciu){
+                // si NO existe el contacto
+                if(ciu == null){
+                    if(req.body.rol === "ciudadano"){
+                    var query = ciudadanoMod.findOneAndUpdate({_id: req.session.user._id},{$addToSet: {'contactosCiudadanos': id_contacto}});
+                    }else{
+                    var query = ciudadanoMod.findOneAndUpdate({_id: req.session.user._id},{$addToSet: {'contactosOrganizaciones': id_contacto}});
+                    }
+                    query.exec(function(err,ciudada){
+                       if(err){
+                           res.json({status: "ERROR", message: "Paso algo en la consulta"});
+                       }else{
+                           res.json({status: "OK", message: "Se ha agregado a tus contactos"});
+                       }
+                    });
+                }else{
+                    // Si EXISTE el contacto entonces se muestra el mensaje
+                   res.json({status: "ERROR", message: "Ya has agregado a tu lista de contactos"}); 
+                }
+            });
+        }else if(req.session.rol === "organizacion"){
+            orgMod = Organizacion.OrganizacionModel;
+            var query1 = orgMod.findOne({
+                $and: [
+                       {_id: req.session.user._id},
+                       {$or: [{'contactosCiudadanos': id_contacto},{'contactosOrganizaciones': id_contacto}]}
+                      ]});
+            query1.exec(function(err,org){
+                if(org == null){
+                    if(req.body.rol === "ciudadano"){
+                    var query = orgMod.findOneAndUpdate({_id: req.session.user._id},{$addToSet: {'contactosCiudadanos': id_contacto}});
+                    }else{
+                    var query = orgMod.findOneAndUpdate({_id: req.session.user._id},{$addToSet: {'contactosOrganizaciones': id_contacto}});
+                    }
+                    query.exec(function(err,org){
+                       if(err){
+                           res.json({status: "ERROR", message: "Paso algo en la consulta de organizacoin"});
+                       }else{
+                           res.json({status: "OK", message: "Se ha agregado a tus contactos"});
+                       } 
+                    });
+                }else{
+                   res.json({status: "ERROR", message: "Ya has agregado a este contacto"}); 
+                }
+            });
+        }
+    }else{
+        res.json({status: "ERROR", message: "INVALID"});
+    }
+});
+    
+router.post('/mis-contactos',function(req, res, next){
+    if(req.session.credencial){
+        if(req.session.rol === "ciudadano"){
+            ciudadanoMod = Ciudadano.CiudadanoModel;
+            console.log("Soy ciudadano");
+            console.log("id: "+req.session.user.email);
+            query = ciudadanoMod.findOne({email: req.session.user.email},{'contactosCiudadanos': 1, 'contactosOrganizaciones':1})
+                .populate('contactosCiudadanos').populate('contactosOrganizaciones');
+            query.exec(function(err,ciu){
+                var cc = ciu.contactosCiudadanos;
+                var co = ciu.contactosOrganizaciones;
+                var ct = [];
+                Array.prototype.push.apply(ct, cc);
+                Array.prototype.push.apply(ct, co);
+                if(err){
+                    res.json({status: "ERROR", message: "Error al hacer consulta"});
+                }else{
+                    res.json({status: "OK", message: ct, algo: "ciudadano"});
+                }
+            });
+        }else if(req.session.rol === "organizacion"){
+            orgMod = Organizacion.CiudadanoModel;
+            query = orgMod.findOne({email: req.session.user.email},{'contactosCiudadanos': 1, 'contactosOrganizaciones':1})
+                .populate('contactosCiudadanos').populate('contactosOrganizaciones');
+            query.exec(function(err,org){
+                var cc = ciu.contactosCiudadanos;
+                var co = ciu.contactosOrganizaciones;
+                var ct = [];
+                Array.prototype.push.apply(ct, cc);
+                Array.prototype.push.apply(ct, co);
+                if(err){
+                    res.json({status: "ERROR", message: "Error al hacer consulta"});
+                }else{
+                    res.json({status: "OK", message: ct, algo: "ciudadano"});
+                }
+            });
+        }
+    }else{
+        res.json({status: 'ERROR', message: "INVALID"});
+    }
+});
+
 router.post("/reporte/:idrep/apoyar",function(req, res, next){
     if(req.session.credencial){
         var reporteMod = Mreporte.ReporteModel;
@@ -106,8 +331,30 @@ router.post("/reporte/:idrep/apoyar",function(req, res, next){
                     if(err){
                         res.send("hubo problemas en la consulta");
                     }else{
-                        res.json({status: 'OK', message: 'Has enviado tu llamado de atención'});  
-                        io.to(req.session.user.ciudad.nombre).emit("apoyo",{message: req.session.user.nick+" Ha realizado un llamado de atencion", update: result.Napoyos.length+1});
+                        // crear notificacion
+                        notifyMod = Mnotify.NotificacionModel;
+                        myNotify = {
+                            titulo: result.titulo,
+                            descripcion: req.session.user.nick+" ha hecho un llamado de atención",
+                            tipo: "LLamado de atención",
+                            reporte: result._id,
+                            autor: req.session.user._id
+                        };
+                        console.log("usuario de la notificacion");
+                        console.log(req.session.user);
+                        notifyObj = new notifyMod(myNotify);
+                        notifyObj.save(function(err, rep){
+                            if(err){
+                                console.log("ERROR AL GUARDAR");
+                                res.json({status: 'ERROR', message: 'Error al guardar la notificacion'});  
+                            }else{
+                                console.log("SE HA ALMACENADO LA NOTIFICACION");   
+                                res.json({status: 'OK', message: 'has enviado tu llamado de atención'});  
+                                io.to(req.session.user.ciudad.nombre).emit("apoyo",{message: myNotify, update: result.Napoyos.length+1, reporte: result._id});
+                                console.log("enviando a: "+req.session.user.ciudad.nombre+""+result.problemas[0]);
+                                io.to(result.ubicacion.nombre+""+result.problemas[0]).emit("apoyo",{message: myNotify, update: result.Napoyos.length+1, reporte: result._id});
+                            }
+                        });
                     }
                 });
             }else{
@@ -149,9 +396,29 @@ router.post("/reporte/:idrep/solucionar",function(req, res, next){
                         if(err){
                             res.json({status:"ERROR", message: "error al actualizar"});
                         }else{
-                            io.to(req.session.user.ciudad.nombre).emit("solucion",{message: "Se ha solucionado el problema: "+result.titulo, update: "Solucionado", repo: result._id});
-                        }
-                    });         
+                            // crear notificacion
+                            notifyMod = Mnotify.NotificacionModel;
+                            myNotify = {
+                                titulo: result.titulo,
+                                descripcion: req.session.user.nick+" ha cambiado el problema como solucionado",
+                                tipo: "Problema solucionado",
+                                reporte: result._id,
+                                autor: req.session.user._id
+                            };
+                            notifyObj = new notifyMod(myNotify);
+                            notifyObj.save(function(err, rep){
+                                if(err){
+                                    console.log("ERROR AL GUARDAR");
+                                    res.json({status: 'ERROR', message: 'Error al guardar la notificacion'});  
+                                }else{
+                                    console.log("SE HA ALMACENADO LA NOTIFICACION");   
+                                    res.json({status: 'OK', message: 'Has enviado tu llamado de atención'});  
+                                    io.to(result.ubicacion.nombre).emit("solucion",{message: myNotify, update: "Solucionado", repo: result._id });
+                                    io.to(result.ubicacion.nombre+""+result.problemas[0]).emit("solucion",{message: myNotify, update: "Solucionado", repo: result._id });
+                                }
+                            });
+                       }     
+                     });
                 }
             }
         });

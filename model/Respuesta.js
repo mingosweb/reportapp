@@ -1,27 +1,24 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
-var Reporte = require("./Reporte");
-var Ciudadano = require("./Ciudadano");
+var Morg = require("./Organizacion");
+var Mreporte = require("./Reporte");
 
-NotificacionSchema = new Schema({
-    titulo: String,
-    descripcion: String,
-    tipo: String,
-    fecha: {type: Date, default: Date.now},
-    reporte: {type: Schema.ObjectId, ref: "Reporte"},
-    autor: {type: Schema.ObjectId, ref: "Ciudadano"}
+RespuestaSchema = new Schema({
+    message: {type: String, default: "I'm a message"},
+    autor: {type: Schema.ObjectId, ref: "Organizacion"},
+    timestamp: {type: Date, default: Date.now},
+    reportes: [{type: Schema.ObjectId, ref: "Reporte"}]
 });
 
 // creamos las propiedades virtuales
-NotificacionSchema.virtual('lapsoDeTiempo').get(function(){
+RespuestaSchema.virtual('lapsoDeTiempo').get(function(){
     actual = new Date();
-    return timeDifference(actual , this.fecha );
+    return timeDifference(actual , this.timestamp );
 });
 
 // configuramos para que utilice las propiedades virtuales
-NotificacionSchema.set('toJSON', {getters: true, virtuals: true});
+RespuestaSchema.set('toJSON', {getters: true, virtuals: true});
 
-// funcion para determinar hace cuanto fue notificado.
 function timeDifference(current, previous) {
     
     var msPerMinute = 60 * 1000;
@@ -74,5 +71,12 @@ function timeDifference(current, previous) {
     }
 }
 
-module.exports.NotificacionModel = mongoose.model("Notificacion",NotificacionSchema);
-module.exports.NotificacionSchema = NotificacionSchema;
+function respuestasById(id){
+    respuestaMod = mongoose.model("Respuesta",RespuestaSchema);
+    var query = respuestaMod.find({autor: id});
+    return query;
+}
+
+module.exports.RespuestaModel = mongoose.model("Respuesta",RespuestaSchema);
+module.exports.RespuestaSchema = RespuestaSchema;
+module.exports.respuestasById = respuestasById;

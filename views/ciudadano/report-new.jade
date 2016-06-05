@@ -13,19 +13,19 @@ block content
                     div(class='block-report row section white z-depth-1' id='informacion-general')
                         h5 Informacion general
                         div(class='input-field col s12')
-                            input(class='' type='text', placeholder='Titulo del reporte' name='titulo')
+                            input(class='' type='text', placeholder='Titulo del reporte' name='titulo' required)
                         div(class='input-field col s12')
-                            textarea(class='materialize-textarea' name='descripcion' type='text' placeholder='Agrega una descripcion')
-                        div(class='input-field col s6 m6 l6')
-                            select(name='categoria' id='categoria')
+                            textarea(class='materialize-textarea' name='descripcion' type='text' placeholder='Agrega una descripcion' required)
+                        div(class='input-field col s12 m6 l6')
+                            select(name='categoria' id='categoria' required)
                                 if categorias
                                     for cat in categorias
                                         option(value='#{cat._id}') #{cat.nombre}
                                 else
                                     option(value='null') No hay categorias
                             label(for="categoria") Elige una categoria
-                        div(class='input-field col s6 m6 l6')
-                            select(name='problema' id='problema')
+                        div(class='input-field col s12 m6 l6')
+                            select(name='problema' id='problema' required)
                                 option(value='null') Sin problemas seleccionados
                             label(for="problema") Elige el tipo de problema
                                 

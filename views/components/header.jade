@@ -1,4 +1,4 @@
-nav(class="main-header navbar-fixed")
+nav(class="main-header")
     div(class='nav-wrapper')		
         a(class="brand-logo left", href="/"): img(src="/images/logo.png")
         if credencial
@@ -7,7 +7,7 @@ nav(class="main-header navbar-fixed")
                 ul(class='right hide-on-med-and-down')
                     if credencial
                         -email = credencial.nombre
-                        -menuHeader = [{option: 'reportes', value: '/'+email, class: "header-option-reportes"},{option: 'reporteros', value: '/'+email, class: "header-option-reporteros"},{option: 'configuracion', value: '/'+email+'/config', class: "header-opcion-configuracion"},{option: 'notificaciones', value: '/'+email, class: "header-opcion-notificaciones"},{option: 'salir', value: '/user/logout', class: "header-opcion-logout"}];
+                        -menuHeader = [{option: 'reportes', value: '/'+email, class: "header-option-reportes"},{option: 'personas', value: '/'+email+'/personas', class: "header-option-reporteros"},{option: 'configuracion', value: '/'+email+'/perfil', class: "header-opcion-configuracion"},{option: 'notificaciones', value: '/'+email+'/notificaciones', class: "header-opcion-notificaciones"},{option: 'salir', value: '/user/logout', class: "header-opcion-logout"}];
                         for opcion in menuHeader
                             if activeHeader === opcion.option
                                 li.active: a(href='#{opcion.value}' class='#{opcion.class}') #{opcion.option}

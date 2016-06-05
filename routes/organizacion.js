@@ -26,6 +26,7 @@ router.post('/add',function(req, res, next){
         ciudadIns = new CiudadModel(ciudad_obj);
         orgObj = new orgModel();
         orgObj.nombre = req.body['nombre-org'];
+        orgObj.suscripcionCiudad.push(ciudadIns);
         orgObj.email = req.body['email-org'];
         orgObj.password = req.body['password-org'];
         orgObj.nit = req.body['nit-org'];
@@ -42,24 +43,32 @@ router.post('/add',function(req, res, next){
       console.log(err); 
         res.json({status: "ERROR", data: "Algo paso con la libreria"});
     });
-	/*orgObj = new orgModel();
-	orgObj.nombre = req.body['nombre-org'];
-	orgObj.email = req.body['email-org'];
-	orgObj.password = req.body['password-org'];
-	orgObj.nit = req.body['nit-org'];
-	orgObj.ciudad =  req.body['ciudad-org'];
-	orgObj.save(function(err,orgs){
-		if(err)
-			res.send("error al agregarse "+err);
-		else
-			res.send(orgs);
-	});*/
 });
 
 router.get('/validate/:email',function(req, res, next){
 	orgModel.find({email: req.params.email},function(err,orgs){
 		res.json(orgs);
 	});
+});
+
+router.post('/misproblemas/list',function(req, res, next){
+    if(req.session.credencial === req.session.user.email+"organizacion"){
+        organizacionMod = organizacion.OrganizacionModel;
+        query = organizacionMod.findOne({_id: req.session.user._id},{suscripcionCategoria: 1, ciudad: 1});
+        query.exec(function(err, problems){
+            if(err){
+                res.json({status: "ERROR", message: "Ha ocurrido un error al consultar la BD"});
+            }else{
+                salas = [];
+                for(var i=0; i < problems.suscripcionCategoria.length; i++){
+                    salas.push(problems.ciudad.nombre+problems.suscripcionCategoria[i]);
+                }
+                res.json({status: "OK", message: salas});
+            }
+        });            
+    }else{
+            res.json({status: "ERROR", message: "INVALID"});
+    }
 });
 
 router.post('/problemas/suscribir',function(req, res, next){    
@@ -73,17 +82,23 @@ router.post('/problemas/suscribir',function(req, res, next){
             }
             organizacionMod = organizacion.OrganizacionModel;
             organizacionMod.findOneAndUpdate({_id: req.session.user._id},{$addToSet: {suscripcionCategoria : {$each : datos}}}, function(err,obj){
-                        if(err){
-                            console.log(err);
-                            res.send({status: 'ERROR', message: "Error al modificar campo"});
-                        }else{
-                            res.send({status: "OK", messaje: obj});
-                        }
+                res.redirect("/"+req.session.user.email+"/config");
             });   
 
         }else{
             res.send({status: 'ERROR', message: "no llegaron problemas"});
         }
+    }else{
+        res.send({status: 'INVALID', message: []});
+    }
+});
+
+router.get('/problemas/eliminar/:id',function(req, res, next){    
+    if(req.session.credencial === req.session.user.email+""+req.session.rol){
+            organizacionMod = organizacion.OrganizacionModel;
+            organizacionMod.findOneAndUpdate({_id: req.session.user._id},{$pull: {suscripcionCategoria : req.params.id}}, function(err,obj){
+                res.redirect("/"+req.session.user.email+"/config");
+            });   
     }else{
         res.send({status: 'INVALID', message: []});
     }

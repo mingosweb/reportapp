@@ -1,3 +1,32 @@
 extends ../layout
 block content
-    h3 hello world
+    include ../components/header
+    div(class='container-margin-m')
+        div(class='row')
+            div(class='col m4 l4 s12')
+                div(class='grid-column grid-panel')
+                    include panel-option
+            div(class='col m8 l8 s12')
+                div(class='grid-column grid-panel')
+                    header(class='header-section row')
+                        div(class='header-container col s12 m12 l12')
+                            ul(class='pagination center' data-template="notificacion")
+                                li(class='waves-efect pagination-prev'): a(href='#') <
+                                li(class='waves-efect pagination-number'): a(href='#') 1
+                                li(class='pagination next'): a(href='#') >
+                    div(class='grid-column container-result' data-template="notificacion")
+                        if notificaciones
+                            for not in notificaciones
+                                div(class='report-list result-item')
+                                    div(class='grid-row')
+                                        div(class='report-list-col-information')
+                                            h3(class='title-mini'): a(href='/#{credencial.nombre}/reportes/::reporte::/details' data-params='titulo') titulo
+                                            p(data-params='descripcion') descripcion
+                                            small(data-params='lapsoDeTiempo') lapsoDeTiempo
+    script(src='/javascripts/pagination.js')
+    script.
+        paginatorReportes = new Paginator("notificacion");
+        paginatorReportes.options.url_ajax = "/notificacion/list/";
+        paginatorReportes.options.numResultsShow = 12;
+        paginatorReportes.obtenerTodos();
+        paginatorReportes.renderizarTemplate();

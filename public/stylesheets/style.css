@@ -1,6 +1,133 @@
 body {
-  background: rgb(242,242,242);
+    background: rgb(242,242,242);
     color: #1F4E79;
+    display: flex;
+    min-width: 100%!important;
+    width: 100% !important;
+    flex-direction: column;
+    align-items: center;
+}
+
+body > *{
+    margin-bottom: 1em;
+}
+
+.container-margin-s{
+    min-width: 95% !important;
+    width: 95%;
+}
+
+.container-margin-m{
+    min-width: 85% !important;
+    width: 85%;
+}
+
+.container-margin-l{
+    min-width: 80% !important;
+    width: 80%;
+}
+
+.grid-column{
+    padding: 0 !important;
+    margin: 0 0 0.7em 0 !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.grid-panel{
+    background: white !important;
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.16);
+}
+
+.title-big{
+    font-size: 2em !important;
+    font-weight: 500;
+}
+
+.title-medium{
+    font-size: 1.6em !important;
+    font-weight: 500;
+}
+
+.title-small{
+    font-size: 1.3em !important;
+    font-weight: 500;
+}
+
+.title-mini{
+    margin: 1.3em 0!important;
+    font-size: 1.17em !important;
+    font-weight: 500;
+}
+
+.message-box{
+    background: rgba(206, 227, 244, 0.83);
+    text-align: center;
+    width: 96%;
+    margin: 1em auto;
+    color: gray;
+    padding: 1em 0.5em;
+}
+
+.grid-column > *{
+    min-width: 95% !important;
+}
+
+.grid-column > .margin-s{
+    margin: 0.5em 0 !important;
+}
+
+.grid-column > .margin-m{
+    margin: 0.8em 0 !important;
+}
+
+.grid-column > .margin-l{
+    margin: 1.1em 0 !important;
+}
+
+.grid-row{
+    margin: 0 !important;
+    padding: 0.7em 0 !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+}
+
+.img-panel-center{
+    width: auto !important;
+    height: 15em !important;
+    margin: 0.5em auto;
+    max-width: none !important;
+}
+
+.btn-float-right{
+    position: absolute;
+    top: 1em;
+    right: 1em;
+}
+
+div.avatar {
+    /* cambia estos dos valores para definir el tamaño de tu círculo */
+    height: 15em;
+    width: 15em;
+    /* los siguientes valores son independientes del tamaño del círculo */
+    background-repeat: no-repeat;
+    background-position: 50%;
+    border-radius: 50%;
+    background-size: 100% auto;
+    margin: auto;
+}
+
+.grid-row > *{
+    margin-left: 0.5em !important;
+}
+
+.grid-child{
+    margin: 0 !important;
+    min-width: 100% !important;
 }
 
 *{
@@ -9,7 +136,7 @@ body {
 }
 
 a {
-  color: #00B7FF;
+  color: #064791;
 }
 
 /* ESTILOS DE SCROLLBAR */
@@ -46,22 +173,22 @@ width: 1px;
 /* scroll slider-reportes */
 
 #container-photos::-webkit-scrollbar{
-  height: 0;
+  height: 1em;
 }
 
 #container-photos::-webkit-scrollbar-button{
-  width:0;
+  width:1em;
 }
 
 #container-photos::-webkit-scrollbar-track{
-  background:red;
-width: 1px;
+  background:rgb(134, 183, 227);
+    width: 1px;
 }
 
 #container-photos::-webkit-scrollbar-thumb{
-  background: green;
-    width: 0;
-    height: 1px !important;
+  background: rgb(31,78,121);
+    width: 1em;
+    height: 2px !important;
 }
 
 #container-photos::-webkit-scrollbar-thumb:hover{
@@ -80,7 +207,7 @@ form ::-webkit-input-placeholder {
 	color: #1F4E79;
 }
 
-form input{
+form input.not("[type=submit]"){
 	border-bottom: 1px solid rgb(31,78,121) !important;
 }
 
@@ -120,6 +247,7 @@ form .block-report{
     box-shadow: 0 0 1px gray;
     padding: 0.7em 0.5em !important;
     margin: 0.4em auto;
+    width: 90% !important;
 }
 
 .btn-solved{
@@ -131,16 +259,16 @@ form .block-report{
     margin: 0.4em auto;
 }
 
-.report-list h3{
-    font-size: 1.2em !important;
-    font-weight: bold;
+.report-list-col-apoyos{
+    min-width: 8em;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
 }
 
-
-/*
-#form-report{
-    background: #f5ffe1;
-}*/
+.report-list h3{
+    margin: 0.5em 0 !important;
+}
 
 /* HEADER */
 
@@ -157,6 +285,7 @@ a.brand-logo img{
 .main-header{
 	padding: 0 1em;
 	background: rgb(31,78,121);
+    color: white !important;
 }
 
 .main-header ul.right li a{
@@ -230,6 +359,30 @@ a.brand-logo img{
 	flex-direction: column;
 }
 
+/* ESTILOS DE RESPUESTAS */
+
+.respuesta{
+    width: 95%;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    margin: 0.5em auto;
+    align-items: center;
+}
+
+.respuesta img{
+    height: 5em;
+    margin-right: 0.5em;
+}
+
+.respuesta p{
+    background: rgb(73, 123, 168);
+    color: white;
+    padding: 0.5em;
+    margin: auto 0.3em;
+    border-radius: 0.8em;
+}
+
 .panel-option{
     display: flex;
     flex-direction: column;
@@ -245,13 +398,21 @@ a.brand-logo img{
 		padding: 0 2em;
 	}
     
+    .container-margin-s,.container-margin-m, .container-margin-l{
+        min-width: 100% !important;
+    }
+    
+    .grid-column{
+        padding: 0.2em !important;
+    }
+    
     #main-content-small{
 		padding: 0;
 	}
-
-	.content-part{
-		margin: 3em 0;
-	}
+    
+    .grid-column{
+        margin: 0.5em 0 !important;
+    }
 
 	.card-option{
 		margin: 1em 0 !important;
@@ -276,6 +437,19 @@ a.brand-logo img{
     
     .container-wrap > *{
         margin: 0.5m auto !important;
+    }
+    
+    .report-list-col-apoyos{
+        min-width: 6em !important;
+    }
+    
+    // scroll de fotos en tamaño de moviles
+    #container-photos::-webkit-scrollbar{
+      height: 0;
+    }
+    
+    #container-photos::-webkit-scrollbar-thumb{
+        height: 0;
     }
 
 }
@@ -325,6 +499,25 @@ a.brand-logo img{
     padding: 0.4em 1em;    
     background: white;
     color: rgba(31, 78, 121, 0.86);
+    border: 0 !important;
+}
+
+.btn-title-dark{
+    text-decoration: none;
+    vertical-align: middle;
+    padding: 0.4em 1em;    
+    background: rgba(31, 78, 121, 0.86);
+    color: white;
+    border: 0 !important;
+}
+
+.btn-title-dark:hover{
+    text-decoration: none;
+    vertical-align: middle;
+    padding: 0.4em 1em;    
+    background: rgba(20, 68, 111, 0.9);
+    color: white;
+    border: 0 !important;
 }
 
 .btn-title:hover{
@@ -362,6 +555,12 @@ a.brand-logo img{
 .modal-img-photo{
     max-height: 40em;
     height: 40em;
+}
+
+/* Estilos select */
+.dropdown-content.select-dropdown > *{
+    /*background: #fcfca1;
+    color: black !important; */
 }
 
 .slider-photos #container-photos li{
@@ -481,10 +680,30 @@ section.panel{
 
 .element-panel > *{
     margin: 0.5em auto;
-    width: 100% !important;
+    width: 100%;
 }
 
+/* LISTA DE OTROS USUARIOS */
 
+.item-user{
+    background: #eae5e5;
+    padding: 0.2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    word-wrap: break-word;
+}
+
+.item-user-picture{
+    height: 7em;
+    border: none;
+    border-radius: 50%;
+}
+
+.item-user > *{
+    margin: 0.2em 0;
+    max-width: 100%;
+}
 
 .panel-title{
     margin: 1.2em auto;

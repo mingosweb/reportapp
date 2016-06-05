@@ -4,14 +4,6 @@ var mongoose = require('mongoose');
 var Mcategoria = require('../model/Categoria');
 var Mproblema = require('../model/Problema');
 
-/*mongoose.connect('mongodb://127.0.0.1/reportar', function(err, res) {
-	  if(err) {
-	    console.log('ERROR: connecting to Database. ' + err);
-	  } else {
-	    console.log('Connected to Database');
-	  }
-}); */
-
 router.post('/list',function(req, res, next){
     var problemaMod = Mproblema.ProblemaModel;
     problemaMod.find({categoria: req.body.categoria}, function(err, problemas){
@@ -20,6 +12,14 @@ router.post('/list',function(req, res, next){
         }else{
             res.json({status: "OK", message: problemas});
         }
+    });
+});
+
+router.post('/categorias/list',function(req, res, next){
+    categoriaMod = Mcategoria.CategoriaModel;
+    var query = categoriaMod.find({});
+    query.exec(function(err,cats){
+        res.json({status: "OK", message: cats});
     });
 });
 

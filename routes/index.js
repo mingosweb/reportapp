@@ -5,7 +5,8 @@ var Ciudadano = require("../model/Ciudadano");
 var Organizacion = require("../model/Organizacion");
 var Mcategoria = require("../model/Categoria");
 var Mreporte = require("../model/Reporte");
-var mongoose = require("mongoose");
+var Mnotify = require("../model/Notificacion");
+var Mrespuesta = require("../model/Respuesta");
 var multer = require("multer");
 var utilities = require("./utilities/menus");
 
@@ -18,12 +19,9 @@ var storage = multer.diskStorage({
   }
 })
 
-var upload = multer({ storage: storage })
+var upload = multer({ storage: storage });
 
-//function initRouter(socket){
-
-/* socketMod = require("./utilities/socket-server");
-mySocket = new socketMod(socket); */
+function initRouter(io){
 
 router.get('/', function(req, res, next) {
     res.render('index',{credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}});
@@ -35,7 +33,8 @@ router.get('/register',function(req,res,next){
 
 router.post('/autenticate/:email/:password',function(req, res, next){
     CiudadanoModel = Ciudadano.CiudadanoModel;
-    query = CiudadanoModel.find({email: req.params.email,password: req.params.password}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
+    query = CiudadanoModel.find({email: req.params.email,password: req.params.password},
+                                {suscripcionCiudad: 1, ciudad: 1, email: 1, nick:1, suscripcionCategoria: 1}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
     query.exec(function(err,ciudadanoss){
         if(err){
             res.send(err);
@@ -47,24 +46,23 @@ router.post('/autenticate/:email/:password',function(req, res, next){
                 req.session.rol = "ciudadano";
                 req.session.nombre = ciudadanoss[0].email;
                 req.session.user = ciudadanoss[0];
-                console.log("entre a ciudadanos y cree sesion");
-                res.json({exist: true, data: {ciudad: ciudadanoss[0].ciudad.nombre, email: ciudadanoss[0].email}});
+                res.json({exist: true, data: {ciudad: ciudadanoss[0].ciudad.nombre, email: ciudadanoss[0].email, obj: ciudadanoss[0], rol: req.session.rol}});
             }else{
                 OrganizacionMod = Organizacion.OrganizacionModel;
-                queryOrg = OrganizacionMod.find({email: req.params.email, password: req.params.password}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
+                queryOrg = OrganizacionMod.find({email: req.params.email,password: req.params.password},
+                                {suscripcionCiudad: 1, ciudad: 1, email: 1, suscripcionCategoria: 1}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
                 queryOrg.exec(function(err,orgs){
                    if(err){
                         res.send(err);
                     }
                     else{
+                        console.log(orgs);
                         if(orgs.length > 0){
                             req.session.credencial = orgs[0].email+"organizacion";
                             req.session.rol = "organizacion";
                             req.session.nombre= orgs[0].email;
                             req.session.user = orgs[0];
-                            console.log("entre a organizacion y cree sesion");
-                            //mySocket.init(orgs[0].ciudad.nombre,orgs[0].email);
-                            res.json({exist: true, data: {ciudad: orgs[0].ciudad.nombre, email: orgs[0].email}});
+                            res.json({exist: true, data: {ciudad: orgs[0].ciudad.nombre, email: orgs[0].email, obj: orgs[0]}});
                         }else{
                             res.json({exist: false, message: 'Usuario y contraseña no coinciden'});
                         }
@@ -77,9 +75,8 @@ router.post('/autenticate/:email/:password',function(req, res, next){
 
 router.get('/:email',function(req, res, next){
     if(req.session.credencial === req.params.email+''+req.session.rol){
-        query = Mreporte.listarReportes(req.session.user.ciudad.nombre,0,12);
+        query = Mreporte.listarReportes(req.session.user.ciudad.nombre);
         query.exec(function(err,rep){
-            console.log(rep);
             if(err){
                 console.log(err);
             }
@@ -92,6 +89,55 @@ router.get('/:email',function(req, res, next){
         });
     }else{
         res.redirect('/');
+    }
+});
+    
+router.get("/:email/perfil", function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+       if(req.session.rol === "ciudadano"){
+           ciudadanoMod = Ciudadano.CiudadanoModel;
+           queryUser = ciudadanoMod.findOne({_id: req.session.user._id},{password: 0, contactosCiudadanos: 0, contactosOrganizaciones: 0});
+           vista = "components/config-profile";
+       }else{
+           orgMod = Organizacion.OrganizacionModel;
+           queryUser = orgMod.findOne({_id: req.session.user._id},{password: 0, contactosCiudadanos: 0, contactosOrganizaciones: 0});
+           vista = "organizacion/config-profile";
+       }
+            
+        queryUser.exec(function(err, user){
+           res.render(vista,{
+                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                opciones: utilities.menuConfig(req.session.nombre, req.session.rol),
+                                activeHeader: "configuracion",
+                                user: user
+                            }); 
+        });     
+    }else{
+        res.redirect("/");
+    }
+});
+    
+router.get("/:email/editar-perfil", function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+        if(req.session.rol === "ciudadano"){
+            ciudadanoMod = Ciudadano.CiudadanoModel;
+            queryUser = ciudadanoMod.findOne({_id: req.session.user._id},{password: 0, suscripcionCategoria: 0, suscripcionCiudad: 0, contactosCiudadanos: 0, contactosOrganizaciones: 0});
+            vista = "components/config-edit-profile";
+        }else{
+            orgMod = Organizacion.OrganizacionModel;
+            queryUser = orgMod.findOne({_id: req.session.user._id},{password: 0, suscripcionCategoria: 0, suscripcionCiudad: 0, contactosCiudadanos: 0, contactosOrganizaciones: 0});
+            vista = 'organizacion/config-edit-profile';
+        }
+        queryUser.exec(function(err, user){
+           res.render(vista,{
+                                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                                opciones: utilities.menuConfig(req.session.nombre, req.session.rol),
+                                                activeHeader: "configuracion",
+                                                user: user
+                                            });   
+        });
+    }else{
+        res.redirect("/");
     }
 });
 
@@ -117,7 +163,7 @@ router.get('/:email/nuevo-reporte',function(req, res, next){
 });
 
 router.get('/:email/config',function(req, res, next){
-    if(req.session.credencial === req.params.email+''+req.session.rol){
+    if(req.session.credencial === req.params.email+'organizacion'){
         var categoriaMod = Mcategoria.CategoriaModel;
         categoriaMod.find({},function(err, cats){
            if(err) {
@@ -147,7 +193,29 @@ router.get('/:email/config',function(req, res, next){
            }
         });
     }else{
-        res.redirect('/');
+        res.redirect('/'+req.session.email);
+    }
+});
+
+router.get('/:email/respuestas-rapidas',function(req, res, next){
+    if(req.session.credencial === req.params.email+'organizacion'){
+        respuestaMod = Mrespuesta.RespuestaModel;
+        query =  respuestaMod.find({autor: req.session.user._id});
+        query.exec(function(err,respuestas){
+            console.log(respuestas);
+            if(err){
+                res.redirect("/"+req.session.nombre+"/perfil");
+            }else{
+                res.render('organizacion/config-respuestas',{
+                                            credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                            opciones: utilities.menuConfig(req.session.nombre, req.session.rol),
+                                            activeHeader: 'configuracion',
+                                            respuestas: respuestas
+                                          });    
+            }
+        });
+    }else{
+        res.redirect("/");
     }
 });
 
@@ -158,8 +226,8 @@ router.get('/:email/reportes/mis-reportes',function(req, res, next){
             if(err){
                 res.send(err);
             }else{
-              res.render('components/home-user',{
-                                    credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+              res.render('ciudadano/my-reports',{
+                                    credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol, id:req.session.user._id}, 
                                     opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
                                     reportes: rep,
                                     activeHeader: "reportes",
@@ -173,7 +241,7 @@ router.get('/:email/reportes/mis-reportes',function(req, res, next){
 });
     
 router.get('/:email/suscribir-ciudad',function(req, res, next){
-    if(req.session.credencial === req.params.email+''+req.session.rol){
+    if(req.session.credencial === req.params.email+''+"ciudadano"){
         var suscrip = [];
         CiudadanoModel = Ciudadano.CiudadanoModel;
         query = CiudadanoModel.findOne({email: req.params.email}).populate({path: 'suscripcionCiudad'});
@@ -189,6 +257,21 @@ router.get('/:email/suscribir-ciudad',function(req, res, next){
         });
     }else{
         res.redirect("/");
+    }
+});
+    
+router.post("/salas",function(req, res, next){
+    if(req.session.credencial === req.session.nombre+'ciudadano'){
+        ciudadanoMod = Ciudadano.CiudadanoModel;
+        query = ciudadanoMod.findOne({_id : req.session.user._id},{suscripcionCiudad: 1});
+        query.exec(function(err,ciu){
+            ciudades = ciu.suscripcionCiudad.map(function(ciudad){
+                return ciudad.nombre;
+            });
+            res.json({status: "OK", message: ciudades});
+        });
+    }else{
+        res.json({status: "ERROR", message: "INVALID"});
     }
 });
 
@@ -225,6 +308,12 @@ router.post('/:email/report/add', upload.array('photos',4), function(req, res, n
             if(err){
                 res.json({status: "ERROR"});
             }else{
+                salaOrg = myReport.ubicacion.nombre+""+myReport.problemas[0];
+                console.log("enviar a sala: "+salaOrg);
+                // enviar a la sala del tipo de problema
+                io.to(salaOrg).emit("recibir",{message: {descripcion: "Nuevo hecho en "+myReport.ubicacion.nombre}, repo: reporte._id});
+                // enviar a toda la ciudad
+                io.to(myReport.ubicacion.nombre).emit("recibir",{message: {descripcion: "Nuevo hecho en "+myReport.ubicacion.nombre}, repo: reporte._id});
                 res.redirect("/"+req.params.email);
             }
         });
@@ -233,12 +322,116 @@ router.post('/:email/report/add', upload.array('photos',4), function(req, res, n
     }
 });
     
+router.get('/:email/notificaciones',function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+        //busqueda de reportes donde haya actuado el usuario
+        notifyMod = Mnotify.NotificacionModel;
+        queryReport = notifyMod.find({'autor': req.session.user._id},{reporte: 1, _id: 0});
+        queryReport.exec(function(err,reports){
+            //res.json(reports);
+            if(err){
+                res.json({status: 'Error'});
+            }else{
+                // recorrer y obtener los ids de los reportes
+                var idReports = [];
+                for(var i=0; i< reports.length; i++){
+                    idReports.push(reports[i].reporte);
+                }
+                // buscar las notificaciones con esos ids
+                queryNotify = notifyMod.find({reporte: {$in: idReports}});
+                queryNotify.exec(function(err,not){
+                    if(err){
+                        res.json({status: 'ERROR', message: "Eror al consultar notificaiones"});
+                    }else{
+                        res.render('components/notifications',{
+                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                opciones: utilities.menuNotificaciones(req.session.nombre, req.session.rol),
+                                activeHeader: 'notificaciones',
+                                notificaciones: not
+                              });
+                    }
+                });
+            }
+        });
+        
+    }else{
+        res.redirect('/');
+    }
+});
+    
+
+router.get("/:email/buscar-notificaciones",function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+        res.render('components/notifications-search',{
+                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                opciones: utilities.menuNotificaciones(req.session.nombre, req.session.rol),
+                                activeHeader: 'notificaciones'});
+    }else{
+        res.redirect("/");
+    }
+});
+    
+router.get('/:email/personas', function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+       res.render('components/reporters',{
+                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                opciones: utilities.menuPersonas(req.session.nombre, req.session.rol),
+                                activeHeader: 'notificaciones'
+                              }); 
+    }else{
+        res.redirect('/');
+    }
+});
+    
+router.post('/users/:palabra',function(req, res, next){
+    if(req.session.credencial){
+        var todos = [];
+        query = Ciudadano.usuariosPorCoincidencia(req.params.palabra);
+        query.exec(function(err, users){
+            if(err){
+                return { status: 'ERROR', message: "error al consultar ciudadanos"};
+            }else{
+                console.log("ciudadanos encontrados: "+users.length);
+                if(users.length > 0){
+                  Array.prototype.push.apply(todos, users);   
+                }
+                orgMod = Organizacion.orgsPorCoincidencias(req.params.palabra);
+                orgMod.exec(function(err, orgs){
+                    if(err){
+                        res.json({status: 'ERROR', message: "error al consultar organizaciones"})
+                    }else{
+                        console.log("orgs encontrados: "+orgs.length);
+                        if(orgs.length > 0){
+                          Array.prototype.push.apply(todos, orgs);   
+                        }
+                        res.json({status: "OK", message: todos});
+                    }
+                });
+            }
+        });
+    }else{
+        res.json({status: 'INVALID'});
+    }
+});
+    
+router.get('/:email/buscar-reportes',function(req, res, next){
+    if(req.session.credencial === req.params.email+''+req.session.rol){
+        res.render('components/reports-search',{
+                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
+                                activeHeader: 'reportes'});
+    }else{
+        res.redirect("/");
+    }
+});
+    
 router.get('/:email/reportes/:idrep/details',function(req, res, next){
     if(req.session.credencial === req.params.email+''+req.session.rol){
+        console.log(req.session.credencial);
         //buscamos el reporte
         reporteMod = Mreporte.ReporteModel;
-        console.log("buscando por: "+req.params.idrep);
-        var query = reporteMod.findOne({_id: req.params.idrep}).populate({path: 'autor', select: 'nick email'}).populate({path:'problemas',select:'nombre categoria',populate: {path:'categoria', select: 'nombre'}});
+        var query = reporteMod.findOne({_id: req.params.idrep}).populate({path: 'autor', select: 'nick email'}).populate({path:'problemas',select:'nombre categoria',populate: {path:'categoria', select: 'nombre'}})
+        .populate({path: 'respuestas', populate: {path: 'autor', select: 'nombre'}});
         query.exec(function(err, report){
             if(err){
                 res.send("error en reporte: "+err);
@@ -251,18 +444,94 @@ router.get('/:email/reportes/:idrep/details',function(req, res, next){
                                                 reporte: report
                                             });
                 }else{
-                    res.render('reportes/details',{
-                                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
-                                                opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
-                                                activeHeader: "reportes",
-                                                reporte: report
-                                            });
+                    // si es una organizacion hay que las respuestas que necesita
+                    if(req.session.rol === "organizacion"){
+                        respuestas = Mrespuesta.respuestasById(req.session.user._id);
+                        respuestas.exec(function(err,resp){
+                            if(err){
+                                res.json({status: "ERROR", message: "Error al consultar en base de datos"});
+                            }else{
+                                console.log(resp);
+                                res.render('reportes/details',{
+                                    credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                    opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
+                                    activeHeader: "reportes",
+                                    reporte: report,
+                                    respuestasIn: resp
+                                });
+                            }
+                        });
+                    }
+                    else if(req.session.rol === "ciudadano"){
+                        res.render('reportes/details',{
+                                    credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                    opciones: utilities.menuPersonas(req.session.nombre, req.session.rol),
+                                    activeHeader: "reportes",
+                                    reporte: report
+                                });
+                    }
                 }
             }
         });
     }else{
         res.redirect("/");
     }
+});
+    
+router.get('/:email/mis-contactos',function(req, res,next){
+   if(req.session.credencial === req.params.email+''+req.session.rol){
+           res.render('components/my-contacts',{
+                                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                                opciones: utilities.menuPersonas(req.session.nombre, req.session.rol),
+                                                activeHeader: "personas",
+                                            });
+   }else{
+       res.redirect('/');
+   }
+});
+    
+router.get('/personas/:nombre',function(req, res, next){
+    ciudadanoMod = Ciudadano.CiudadanoModel;
+    query = ciudadanoMod.findOne({nick: req.params.nombre}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
+    query.exec(function(err,user){
+        if(err){
+            res.send("error en consulta de usuarios");
+        }else{
+            if(user === null){
+                orgMod = Organizacion.OrganizacionModel;
+                queryOrg = orgMod.findOne({nombre: req.params.nombre}).populate({path: 'suscripcionCategoria', select: 'nombre categoria', populate: {path: 'categoria', select: 'nombre'}});
+                queryOrg.exec(function(err,org){
+                    if(err){
+                        res.send("error consultando org");
+                    }else{
+                        res.render('components/profile', {
+                                                credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                                                opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
+                                                activeHeader: "personas",
+                                                persona: org
+                                            });
+                    }
+                });
+            }else{
+                var reports = Mreporte.reportesByUser(user._id);
+                reports.exec(function(err,reps){
+                    var results = [];
+                    if(err){
+                        results = results;
+                    }else{
+                        results = reps;
+                        res.render('components/profile', {
+                            credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
+                            opciones: utilities.menuReportes(req.session.nombre, req.session.rol),
+                            activeHeader: "personas",
+                            persona: user,
+                            reportes: results
+                        });
+                    }
+                });
+            }
+        }
+    });
 });
 
 router.post('/place',function(req, res, next){
@@ -274,8 +543,8 @@ router.post('/place',function(req, res, next){
     });
 });
     
-  //  return router;
+    return router;
     
-//}
+}
 
-module.exports = router;
+module.exports.initRouter = initRouter;

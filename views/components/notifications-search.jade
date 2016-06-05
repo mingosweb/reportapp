@@ -1,0 +1,33 @@
+extends ../layout
+block content
+    include ../components/header
+    div(class='container-margin-m')
+        div(class='row')
+            div(class='col m3 l4 s12')
+                div(class='grid-column grid-panel')
+                    h4(class='title-small') Encuentra tus notificaciones
+                    div(class="input-field col s12")
+                            input(type="text" data-url='' placeholder='Ingresa una palabra clave' required)
+                            label(for="search-peoples" id='label-peoples')
+                    figure(class='align-center hide-on-med-and-down')
+                        img(src='/images/search-reports.png' class='responsive-img')
+            div(class='col m7 l8 s12')
+                div(class='grid-column grid-panel')
+                        div(class='message-box')
+                            h4.title-small Encuentra los sucesos que ocurren en reportar.co mas rapido. ingresa una palabra y listo!
+                        header(class='row header-section container-controls')
+                            div(class='header-container col s12 m4 l4')
+                                    ul(class='pagination center' data-template='reporte-list')
+                                        li(class='pagination-prev waves-efect'): a(href='#') <
+                                        li(class='pagination-number' data-index='#{iter}'): a(href='#') #{1+ iter++}
+                                        li(class='pagination-next'): a(href='#') >
+                        div(class='header-container col s12 m4 l4')
+                            div(class='input-field')
+                                select(name="categorias")
+                                    option(value="categoria 1") Ciudadanos
+                                    option(value="categoria 2") Organizacion
+                        div(class='container-results' data-type='peoples')
+                            // results here
+block append scripts
+    script(src='/javascripts/pagination.js')
+    script(src='/javascripts/search-peoples.js')

@@ -5,15 +5,30 @@ block content
             section(class='block-report row panel')
                 div.container-title.container-wrap
                     h5 #{ reporte.titulo }
+                    input(type="hidden" id='id-reporte' value='#{reporte._id}')
                     div
-                        a(class='btn-title tooltip' id='btn-apoyo' data-idrep='#{reporte._id}' data-position='top' data-delay='50' data-tooltip='Alza la voz'): i(class='fa fa-bullhorn')
+                        if credencial.rol === "ciudadano"
+                            a(class='btn-title tooltip' id='btn-apoyo' data-idrep='#{reporte._id}' data-position='top' data-delay='50' data-tooltip='Llamado de atención'): i(class='fa fa-bullhorn')
                         if credencial.nombre === reporte.autor.email
                             a(class='btn-title tooltip' data-position='top' data-delay='50' data-tooltip='Eliminar' id='btn-eliminar'): i(class='fa fa-trash')
                         if credencial.nombre === reporte.autor.email
                             a(class='btn-title tooltip btn-solved' data-position='top' data-delay='50' data-tooltip='Marcar como solucionado' id='btn-solucionar'): i(class='fa fa-check')
                         if credencial.rol === "organizacion"
-                            a(class='btn-title tooltip' data-position='top' data-delay='50' data-tooltip='Agregar una nota rapida'): i(class='fa fa-pencil-square-o')
+                            a(class='btn-title tooltip' href='#modal-respuesta' data-position='top' data-delay='50' data-tooltip='Agregar una nota rapida' id="openModal"): i(class='fa fa-pencil-square-o')
                 hr(class='linear-title')
+                
+                // mostrar modal
+                div(class='modal modal-fixed-footer' id="modal-respuesta")
+                    div(class="modal-content")
+                        h4.title-medium Selecciona una respuesta rapida
+                            if respuestasIn
+                                div(class='input-field')
+                                    select(name="respuesta" id='select-respuesta')
+                                        option(value="") Selecciona una 
+                                            for res in respuestasIn
+                                                option(value="#{res._id}") #{res.message}
+                        a(id="btn-add-respuesta" class='btn') Enviar respuesta
+                // slider de fotos          
                 div(class='slider-photos')
                     ul(class='container-title' id='container-photos')
                         if reporte.url_fotos.length > 0
@@ -32,7 +47,7 @@ block content
                         div(class='panel-data element-panel')
                             p.panel-data-item
                                 strong.left-align Fecha de publicación
-                                span.right-align #{ reporte.timestamp }
+                                span.right-align #{ reporte.timestamp.toLocaleDateString() }
                             p.panel-data-item
                                 strong.left-align Tipo de problema
                                 for problema in reporte.problemas
@@ -52,8 +67,25 @@ block content
                         h5 Ubicación
                         hr(class='linear-title')
                         div(id='map-report-result' data-lat="#{reporte.ubicacion.lat}" data-lng="#{reporte.ubicacion.lng}" class='z-depth-1')
+                section(class='block-report row panel')
+                    div.element-panel
+                        h5 Respuestas
+                        hr(class='linear-title')
+                    div(class='container-result' data-template="respuesta")
+                        div.element-panel
+                            if reporte.respuestas
+                                for resp in reporte.respuestas
+                                    div(class='result-item respuesta')
+                                        div(class='respuesta-img')
+                                            img(src='/images/avatar-organizacion.png')
+                                        div(class='respuesta-contenido')
+                                            p #{resp.message}
+                                            small #{resp.autor.nombre} | #{resp.lapsoDeTiempo}
+                            
             
 block append scripts
+    script.
+        $("#openModal").leanModal()
     script(src='/javascripts/slider-report-photos.js')
     script(src='/javascripts/btn-title.js')
     script(src='/javascripts/map.js')

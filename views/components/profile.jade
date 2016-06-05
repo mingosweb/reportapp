@@ -1,0 +1,64 @@
+extends ../layout
+block content
+    include ./header
+    section(class='container-margin-m')
+        div(class='row')
+            div(class='col s12 m12 l4')
+                div(class='grid-column')
+                    div.item-user.grid-panel
+                        div.grid-row
+                            a(class='btn-title tooltip' data-position='top' data-delay='50' data-tooltip='Añadir' id='btn-add-user'): i(class='fa fa-user-plus fa-2x')
+                            a(class='btn-title tooltip' data-position='top' data-delay='50' data-tooltip='Eliminar' id='btn-delete-user'): i(class='fa fa-user-times fa-2x')
+                        img(src='/images/avatar-ciudadano.png' class='item-user-picture')
+                        h4(class='title-small') #{persona.nick}
+                        input(type='hidden' id="id_people" value="#{persona._id}")
+                        if persona.nit
+                            input(type='hidden' id="id_rol" value="organizacion")
+                        else
+                            input(type='hidden' id="id_rol" value="ciudadano")
+                        span #{persona.email}
+                        span #{persona.ciudad.nombre}
+                div(class='grid-column')
+                    div.item-user.grid-panel
+                        h2(class='title-mini') Detalles
+                        hr(class='linear-title')
+                        div(class="panel-data element-panel")
+                            p(class="panel-data-item")
+                                strong(class="left-align") Ciudades suscritas
+                                ul
+                                    if persona.suscripcionCiudad && persona.suscripcionCiudad.length > 0
+                                        for ciudad in persona.suscripcionCiudad
+                                            li #{ ciudad.nombre }
+                                    else
+                                        label Ninguno
+                            p(class="panel-data-item")
+                                strong(class="left-align") Problemas suscritos
+                                ul
+                                    if persona.suscripcionCategoria.length > 0
+                                        for problema in persona.suscripcionCategoria
+                                            li #{ problema.nombre }
+                                    else
+                                        label Ninguno
+                            p(class="panel-data-item")
+                                strong(class="left-align") Usuarios seguidos
+                                span(class="right-align") #{ persona.contactosCiudadanos.length + persona.contactosOrganizaciones.length }
+                        //
+                            p(class="panel-data-item")
+                                strong(class="left-align") Seguidores
+                                span(class="right-align") 123
+            div(class='col s12 m12 l8')
+                div(class='grid-column grid-panel')
+                    if persona.nit
+                        h3.title-small Reportes respondidos por #{persona.nombre}
+                    else
+                        h3.title-small Reportes creados por #{persona.nick}
+                    include result-container-list
+block append scripts
+    script(src='/javascripts/pagination.js')
+    script(src='/javascripts/ciudadano/btn-action-reports.js')
+    script.
+        paginatorReportes = new Paginator("reporte-list");
+        paginatorReportes.options.url_ajax = "/reporte/persona/"+$("#id_people").val();
+        paginatorReportes.options.numResultsShow = 12;
+        paginatorReportes.obtenerTodos();
+        paginatorReportes.renderizarTemplate();

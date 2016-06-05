@@ -1,0 +1,38 @@
+extends ../layout
+block content
+    include ../components/header
+    div(class='container-margin-m')
+        div(class='row')
+            div(class='col m3 l4 s12')
+                include panel-option
+            div(class='col m7 l8 s12')
+                div(class='grid-column grid-panel' style='position: relative')
+                    div.row
+                        div(class='row grid-row')
+                            form(id="form-edit" action='/ciudadano/edit-profile' enctype="multipart/form-data" method='post')
+                                div(class='panel-data element-panel')
+                                    if user
+                                        if user.nombre === ""
+                                            div(class="input-field col s12 l12 align-right")
+                                                input(id="nombre" type="text" name='nombre' placeholder='Nombre' class="validate" required)
+                                        if user.apellido === ""
+                                            div(class="input-field col s12 l12 align-right")
+                                                input(id="apellido" type="text" name='apellido' placeholder='Apellido' class="validate" required)
+                                        if (user.direccion || user.direccion === "")
+                                            div(class="input-field col s12 l12 align-right")
+                                                input(id="direccion" type="text" name='direccion' placeholder='dirección' class="validate")
+                                        if (user.telefono || user.telefono === "")
+                                            div(class="input-field col s12 l12 align-right")
+                                                input(id="telefono" type="number" name='telefono' placeholder='teléfono' class="validate")
+                                        if (user.urlPerfil === "" || user.urlPerfil)
+                                            div(class="input-field col s12 l12 align-right")
+                                                input(id="urlPerfil" name='urlPerfil' type="file")
+                                        div(class="input-field col s12 l12 align-right")
+                                            input(type='submit' class="col s12 l12 btn")
+block append scripts
+    script(src="http://maps.google.com/maps/api/js?libraries=places")
+    script(src='/javascripts/pagination.js')
+    script(src='/javascripts/autocomplete.js')
+    script.
+        template = "contacto";
+    script(src='/javascripts/search-peoples.js')

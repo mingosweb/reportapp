@@ -1,27 +1,38 @@
-var mongoose = require("mongoose");
-var Schema = mongoose.Schema;
-var Reporte = require("./Reporte");
-var Ciudadano = require("./Ciudadano");
+var express = require('express');
+var router = express.Router();
+var Mrespuesta = require("../model/Respuesta");
 
-NotificacionSchema = new Schema({
-    titulo: String,
-    descripcion: String,
-    tipo: String,
-    fecha: {type: Date, default: Date.now},
-    reporte: {type: Schema.ObjectId, ref: "Reporte"},
-    autor: {type: Schema.ObjectId, ref: "Ciudadano"}
+router.post("/add",function(req, res, next){
+    if(req.session.credencial === req.session.user.email+'organizacion'){
+        respuestaMod = Mrespuesta.RespuestaModel;
+        objeto = new respuestaMod({
+            message: req.body.message,
+            autor: req.session.user._id
+        });
+        objeto.save(function(err,respues){
+            if(err){
+                res.json({status: "ERROR", message: "Error en la consulta"});
+            }else{
+                res.redirect("/"+req.session.nombre+"/respuestas-rapidas");
+            }
+        });
+    }else{
+        res.json({status: "ERROR", message: "INVALID"});
+    }
 });
 
-// creamos las propiedades virtuales
-NotificacionSchema.virtual('lapsoDeTiempo').get(function(){
-    actual = new Date();
-    return timeDifference(actual , this.fecha );
+router.get('/remove/:id', function(req, res, next){
+    if(req.session.credencial === req.session.nombre+'organizacion'){
+        respuestaMod = Mrespuesta.RespuestaModel;
+        query = respuestaMod.remove({_id: req.params.id});
+        query.exec(function(err,resp){
+            res.redirect("/"+req.session.nombre+"/respuestas-rapidas");
+        });
+    }else{
+        res.redirect("/"+req.session.nombre);
+    }
 });
 
-// configuramos para que utilice las propiedades virtuales
-NotificacionSchema.set('toJSON', {getters: true, virtuals: true});
-
-// funcion para determinar hace cuanto fue notificado.
 function timeDifference(current, previous) {
     
     var msPerMinute = 60 * 1000;
@@ -74,5 +85,4 @@ function timeDifference(current, previous) {
     }
 }
 
-module.exports.NotificacionModel = mongoose.model("Notificacion",NotificacionSchema);
-module.exports.NotificacionSchema = NotificacionSchema;
+module.exports = router;

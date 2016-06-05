@@ -1,0 +1,41 @@
+extends ../layout
+block content
+    include ../components/header
+    div(class='container-margin-m')
+        div(class='row')
+            div(class='col m3 l4 s12')
+                include panel-option
+                div(class='grid-column grid-panel')
+                    h4(class='title-small') Encuentra a otras personas
+                    div(class="input-field col s12")
+                            input(data-url="/users/::key::" class="search-pagination" type="text" placeholder='Ingresa un nombre' required)
+                            label(for="search-peoples" id='label-peoples')
+                    figure(class='align-center hide-on-med-and-down')
+                        img(src='/images/search.png' class='responsive-img')
+            div(class='col m7 l8 s12')
+                div(class='grid-column grid-panel')
+                        div(class='message-box')
+                            h4.title-small Busca otras personas u organizaciones. ingresa un nombre en el campo de busqueda y encuentra al instante!
+                        header(class='row header-section container-controls')
+                            div(class='header-container col s12 m4 l4')
+                                    ul(class='pagination center' data-template='contacto')
+                                        li(class='pagination-prev waves-efect'): a(href='#') <
+                                        li(class='pagination-number' data-index='#{iter}'): a(href='#') #{1+ iter++}
+                                        li(class='pagination-next'): a(href='#') >
+                            div(class='header-container col s12 m4 l4')
+                                div(class='input-field')
+                                    select(name="categorias")
+                                        option(value="categoria 1") Ciudadanos
+                                        option(value="categoria 2") Organizacion
+                        div(class='container-result' data-template='contacto')
+                            // results here
+                            div(class='col s12 m6 l4 grid-column result-item')
+                                div(class='item-user')
+                                    img(src='/images/avatar-ciudadano.png' class='item-user-picture' data-params="urlPerfil")
+                                    a(href='/personas/::apodo::' data-params="apodo") apodo
+                                    span(data-params="email") data[i].email                  
+block append scripts
+    script(src='/javascripts/pagination.js')
+    script.
+        template = "contacto";
+    script(src='/javascripts/search-peoples.js')

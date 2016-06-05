@@ -1,11 +1,14 @@
 extends ../layout
 block content
     include ../components/header
-    div(id='main-content' class='row')
-        div(class='subcontainer')
-            -active = 'suscribir problema'
-            include ../components/panel-option
-            section(class='white z-depth-1 col s12 m8 l8 panel')
+    section(class='container-margin-m')
+        div(class='row')
+            section(class='col s12 m4 l4')
+                div(class='grid-column grid-panel')
+                    -active = 'suscribir problema'
+                    include ../components/panel-option
+            section(class='col s12 m12 l8')
+                div(class='grid-column grid-panel')
                     div.row
                         h5(class='panel-title') Seleccion de problemas
                         div(class='input-field container')
@@ -32,12 +35,12 @@ block content
                                     li(class='row collection-suscripcion-item')
                                         div(class='col s4 item-value') #{problema.nombre}
                                         div(class='col s4 item-value') #{problema.categoria.nombre}
-                                        div(class='col s4 item-option'): a(href="/#{credencial.rol}/problemas/eliminar/#{problema._id}") quitar de la lista
-                                
+                                        div(class='col s4 item-option')
+                                            a(href="/#{credencial.rol}/problemas/eliminar/#{problema._id}")
+                                                i(class='fa fa-trash hide-on-med-and-up')
+                                                i(class='hide-on-small-only') quitar de la lista
+
                         else
                             h5 No hay ningun dato
 block append scripts
-    if credencial.rol === "ciudadano"
-        script(src="/javascripts/ciudadano/add-problems.js")
-    else
-        script(src="/javascripts/organizacion/add-problems.js")
+    script(src="/javascripts/organizacion/add-problems.js")

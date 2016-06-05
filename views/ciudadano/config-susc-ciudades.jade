@@ -1,11 +1,14 @@
 extends ../layout
 block content
     include ../components/header
-    div(id='main-content' class='row')
-        div(class='subcontainer')
+    section(class='container-margin-m')
+        div(class='row')
             -active = 'suscribir ciudad'
-            include ../components/panel-option
-            section(class='white z-depth-1 col s12 m8 l8 panel')
+            section(class='col s12 m4 l4 hide-on-med-and-down')
+                div(class='grid-column grid-panel')
+                    include ../components/panel-option
+            section(class='col s12 m12 l8')
+                div(class='grid-column grid-panel')
                     div.row
                         h5(class='panel-title') Buscador de ciudades
                         div(class='input-field container')
@@ -22,14 +25,14 @@ block content
                                 for ciudad in suscripcion
                                     li(class='row collection-suscripcion-item')
                                         div(class='col s6 item-value') #{ciudad.nombre}
-                                        div(class='col s6 item-option'): a(href="/ciudadano/ciudades/eliminar/#{ciudad.place_id}") quitar de la lista
+                                        div(class='col s6 item-option')
+                                            a(href="/ciudadano/ciudades/eliminar/#{ciudad.place_id}")
+                                                i(class='fa fa-trash hide-on-med-and-up')
+                                                i(class='hide-on-small-only') quitar de la lista
                                 
                         else
                             h5 No hay ningun dato
 block append scripts
     script(src="http://maps.google.com/maps/api/js?libraries=places")
-    if credencial.rol === "ciudadano"
-        script(src="/javascripts/ciudadano/add-problems.js")
-    else
-        script(src="/javascripts/organizacion/add-problems.js")
+    script(src="/javascripts/ciudadano/add-ciudad.js")
     script(src="/javascripts/autocomplete.js")

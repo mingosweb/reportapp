@@ -12,6 +12,8 @@ var orgRoutes = require('./routes/organizacion.js');
 var adminRoutes = require('./routes/admin.js');
 var problemaRoutes = require('./routes/problemas.js');
 var reporteRoutes = require('./routes/reportes.js');
+var notificacionRoutes = require('./routes/notificacion.js');
+var respuestaRoutes = require('./routes/respuesta.js');
 
 var app = express();
 var server = require("http").Server(app);
@@ -39,17 +41,13 @@ io.on('connection',function(socket){
     
     //evento que une a una sala recibe como datos la ciudad
     socket.on('logmeroom', function(data) { 
-        if(data !== ""){
+        if(data !== null && !data.empty){
             socket.leave(socket.id);
-            socket.join(data.room);
+            socket.join(data.salas);
+            console.log("unido a sala "+data.salas);
         }else{
-            console.log("no hay ciudad");
+            console.log("no se ha unido a nada mas");
         }
-    });
-    
-    // evento receptor que prepara y envia una notificacion a los usuarios conectados
-    socket.on("notificar",function(data){
-        io.to(data.channel).emit("recibir",{message: "Nuevo hecho en "+data.channel});
     });
     
     //evento para cuando se descconecta
@@ -59,14 +57,14 @@ io.on('connection',function(socket){
     
 });
 
-//console.log(io.nsps['/']);
-
-app.use('/', routes);
+app.use('/', routes.initRouter(io));
 app.use('/ciudadano', users.initRouter(io));
 app.use('/organizacion', orgRoutes);
 app.use('/admin', adminRoutes);
 app.use('/problema',problemaRoutes);
 app.use('/reporte',reporteRoutes);
+app.use('/notificacion',notificacionRoutes);
+app.use('/respuesta',respuestaRoutes);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

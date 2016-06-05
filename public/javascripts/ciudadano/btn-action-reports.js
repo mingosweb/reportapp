@@ -71,3 +71,62 @@ $("#btn-solucionar").on("click",function(){
     return false;
 });
 
+// añadir un nuevo usuario
+if($("#btn-add-user").length > 0){
+    $("#btn-add-user").on("click",function(){
+        var ids = $("#id_people").val();
+        var rolIn = $("#id_rol").val();
+        $.ajax({
+            url: '/ciudadano/personaadd',
+            dataType: 'json',
+            type: 'post',
+            data: {idpersona: ids, rol: rolIn},
+            success: function(data){
+                if(data.status === "OK"){
+                    var $toastContent = $('<span class="my-toast">'+data.message+'</span>');
+                    setTimeout(function(){
+                        Materialize.toast($toastContent, 2000);
+                    },500);
+                }else if(data.status === "ERROR"){
+                    var $toastContent = $('<span class="my-toast">'+data.message+'</span>');
+                    setTimeout(function(){
+                        Materialize.toast($toastContent, 2000);
+                    },500);
+                }
+            },
+            error: function(err, objmsj, msj){
+                alert("error en la peticion");
+            }
+        });
+    });
+};
+
+// eliminar usuairo
+if($("#btn-delete-user")){
+    $("#btn-delete-user").on("click", function(){
+        var ids = $("#id_people").val();
+        var rolIn = $("#id_rol").val();
+        $.ajax({
+            url: '/ciudadano/personaremove',
+            dataType: 'json',
+            type: 'post',
+            data: {idpersona: ids, rol: rolIn},
+            success: function(data){
+                if(data.status === "OK"){
+                    var $toastContent = $('<span class="my-toast">'+data.message+'</span>');
+                    setTimeout(function(){
+                        Materialize.toast($toastContent, 2000);
+                    },500);
+                }else if(data.status === "ERROR"){
+                    var $toastContent = $('<span class="my-toast">'+data.message+'</span>');
+                    setTimeout(function(){
+                        Materialize.toast($toastContent, 2000);
+                    },500);
+                }
+            },
+            error: function(err, objmsj, msj){
+                alert("error en la peticion");
+            }
+        });
+    });
+}

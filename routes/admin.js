@@ -4,11 +4,11 @@ var mongoose = require('mongoose');
 var Mcategoria = require('../model/Categoria');
 var Mproblema = require('../model/Problema');
 
-mongoose.connect('mongodb://127.0.0.1/reportar', function(err, res) {
+mongoose.connect('mongodb://127.0.0.1/reportapp', function(err, res) {
 	  if(err) {
 	    console.log('ERROR: connecting to Database. ' + err);
 	  } else {
-	    console.log('Connected to Database');
+	    console.log('Connected to Database jue');
 	  }
 });
 

@@ -1,0 +1,43 @@
+extends ../layout
+block content
+    include ../components/header
+    section(class='container-margin-m')
+        div(class='row')
+            section(class='col s12 m4')
+                div(class='grid-column grid-panel')
+                    include ../components/panel-option
+            section(class='col s12 m12 l8')
+                div(class='grid-column grid-panel')
+                    div(class='block-report row')
+                        h5.title-medium.center-align ¡Agrega notas rapidas!
+                        div.message-box Las notas rapidas ayudan a que los ciudadanos conozcan tu interes por los problemas que te suscribes! te ayudará tambien a mostrarles a los usuarios que vean tu perfil verán que tanto ayudas a sus problemas.
+                        form(class='element-panel' action="/respuesta/add" method="POST")
+                            div.grid-row
+                                div(class='input-field col s12')
+                                    textarea(class='materialize-textarea' name='message' type='text' placeholder='Escribe tu respuesta rapida aqui ...' required)
+                                div(class='input-field col s12')
+                                    input(type="submit" value="guardar" class='btn-title')
+                    div.element-panel
+                        h5 Tus respuestas
+                        hr(class='linear-title')
+                    div(class='container-result' data-template="respuesta")
+                        div.element-panel
+                            if respuestas && respuestas.length > 0
+                                for res in respuestas
+                                    div(class='result-item respuesta')
+                                        div(class='respuesta-img')
+                                            img(src='/images/avatar-organizacion.png')
+                                        div(class='respuesta-contenido')
+                                            p.
+                                                #{res.message}
+                                            small #{res.lapsoDeTiempo}
+                                        a(class='btn-title tooltip' id='btn-remove-respuesta' data-idres='reporte._id' data-position='top' data-delay='50' data-tooltip='Eliminar' href='/respuesta/remove/#{res._id}'): i(class="fa fa-remove" aria-hidden="true")
+                            else
+                                div(class='block-report row')
+                                    div.message-box No tienes respuestas rapidas creadas.
+                    
+block append scripts
+    if credencial.rol === "ciudadano"
+        script(src="/javascripts/ciudadano/add-problems.js")
+    else
+        script(src="/javascripts/organizacion/add-problems.js")

@@ -1,5 +1,6 @@
 /* MENUS */
 
+// menu para reportes
 function menuReportes(email, rol){
     var opciones = [];
     if(rol === "ciudadano"){
@@ -12,39 +13,36 @@ function menuReportes(email, rol){
     }else{
         opciones = [
             {valor: "Reportes recibidos", url:"/"+email},
-            {valor: "Buscar reportes", url:"/"+email+"/mis-reportes"}
+            {valor: "Buscar reportes", url:"/"+email+"/buscar-reportes"}
         ];
     }
     return opciones;
 }
 
+//menu de configuración
 function menuConfig(email, rol){
     var opciones = [];
     if(rol === "ciudadano"){
         opciones = [
             {valor: "Perfil", url:"/"+email+"/perfil"},
-            {valor: "Cambiar contraseña", url:"/"+email+"/cambiar-clave"},
-            {valor: "Desactivar cuenta", url:"/"+email+"/desactivar"},
-            {valor: "suscribir problema", url:"/"+email+"/suscribir-problema"},
+            //{valor: "suscribir problema", url:"/"+email+"/config"},
             {valor: "suscribir ciudad", url: "/"+email+"/suscribir-ciudad"}
         ];
     }else{
         opciones = [
             {valor: "Perfil", url:"/"+email+"/perfil"},
-            {valor: "Cambiar contraseña", url:"/"+email+"/cambiar-clave"},
-            {valor: "Desactivar cuenta", url:"/"+email+"/desactivar"},
-            {valor: "suscribir problema", url:"/"+email+"/suscribir-problema"},
-            {valor: "Condecoraciones", url: "/"+email+"/suscribir-ciudad"},
-            {valor: "Respuestas rapidas", url: "/"+email+"/suscribir-ciudad"}
+            {valor: "suscribir problema", url:"/"+email+"/config"},
+            {valor: "Respuestas rapidas", url: "/"+email+"/respuestas-rapidas"}
         ];
     }
     return opciones;
 }
 
+// menu de encabezado
 function menuHead(email){
     menuHeader = [
         {option: 'reportes', value: '/'+email, id: "header-option-reportes"},
-        {option: 'reporteros', value: '/'+email, id: "header-option-reporteros"},
+        {option: 'personas', value: '/'+email+'/personas', id: "header-option-reporteros"},
         {option: 'configuracion', value: '/'+email+'/config', id: "header-opcion-configuracion"},
         {option: 'notificaciones', value: '/'+email+'/notificaciones', id: "header-opcion-notificaciones"},
         {option: 'salir', value: '/user/logout', id: "header-opcion-logout"}
@@ -52,6 +50,26 @@ function menuHead(email){
     return menuHeader;
 }
 
+function menuNotificaciones(email){
+    options = [
+        {valor : "Todas las notificaciones", url: "/"+email+"/notificaciones"},
+        {valor: "Buscar notificaciones", url: "/"+email+"/buscar-notificaciones"}
+    ];
+    
+    return options;
+}
+
+function menuPersonas(email, rol){
+    options = [
+        {valor : "Buscar personas y organizaciones", url: "/"+email+"/personas"},
+        {valor: "mis contactos", url: "/"+email+"/mis-contactos"}
+    ];
+    
+    return options;
+}
+
 module.exports.menuReportes = menuReportes;
 module.exports.menuConfig = menuConfig;
 module.exports.menuHeader = menuHead;
+module.exports.menuNotificaciones = menuNotificaciones;
+module.exports.menuPersonas = menuPersonas;

@@ -1,12 +1,30 @@
 extends ../layout
 block content
     include ../components/header
-    div(id='' class='row')
-        div(class='subcontainer')
-            include panel-option
-            if active === "mis reportes"
-                include result-container-list
-            else
-                include result-container
+    section(class='container-margin-m')
+        div(class='row')
+            div(class='col s12 m4 l4 hide-on-med-and-down')
+                div(class='grid-column grid-panel')
+                    include panel-option
+            div(class='col s12 m12 l8')
+                div(class='grid-column grid-panel')
+                    if active === "mis reportes"
+                        include result-container-list
+                    else
+                        include result-container
+        div(class="fixed-action-btn click-to-toggle hide-on-large-only" style="bottom: 45px; right: 24px;")
+            a(class="btn-floating btn-large red darken-4"): i(class="fa fa-reorder")
+            if opciones
+                ul
+                    for opcion in opciones
+                        li: a(class="btn-floating red lighten-1" href="#{opcion.url}") #{opcion.valor}
 block append scripts
     script(src='/javascripts/pagination.js')
+    script.
+        paginatorReportes = new Paginator("reporte");
+        paginatorReportes.options.url_ajax = "/reporte/list/"+localStorage.getItem("ciudad");
+        paginatorReportes.options.numResultsShow = 12;
+        paginatorReportes.obtenerTodos();
+        paginatorReportes.renderizarTemplate();
+    script.
+        $('.fixed-action-btn').openFAB();

@@ -1,38 +1,17 @@
-section(class='white z-depth-1 col s12 m8 l8')
-    header(class='row header-section')
-        div(class='header-container col s12 m3 l3')
-            ul(class='tabs')
-                li(class='tab'): a(href='#') Recientes
-                li(class='tab'): a(href='#') Populares
-        div(class='header-container col s12 m5 l5')
-            if reportes
-                -totalPages = Math.ceil(reportes.length / 12)
-                ul(class='pagination center' data-skip="0")
-                    li(class='waves-efect'): a(href='#') <
-                    -iter = 0
-                    while iter < totalPages
-                        if iter === 0
-                            li(class='active' data-index='#{iter}'): a(href='#' class='active') #{1+ iter++}
-                        else
-                            li(data-index='#{iter}'): a(href='#') #{1+ iter++}
-                    li: a(href='#') >
-        div(class='header-container col s12 m4 l4')
-            div(class='input-field')
-                select(name="categorias")
-                    option(value="categoria 1") Actos delictivos
-                    option(value="categoria 2") Medio ambiente
-                    option(value="categoria 3") Transporte
-                    option(value="categoria 3") Servicios publicos
-                    option(value="categoria 3") Salud
-    section(class='row grid-cards')
-        div(class='row row-cards')
-            if reportes
-              for rep in reportes
-                   div(class='col s12 m4 l4')
-                        div(class="card card-report")
-                            figure(class="card-image" class='card-report-container-img')
-                                img(src="/photos/#{rep.url_fotos[0]}" class='card-report-img')
-                            div(class="card-content")
-                                p: a(href='/#{credencial.nombre}/reportes/#{rep._id}/details') #{rep.titulo}
-            else
-                h5 no hay reportes
+header(class='row header-section')
+    div(class='header-container col s12 m5 l5')
+            ul(class='pagination center' data-template='reporte')
+                li(class='pagination-prev waves-efect'): a(href='#') <
+                li(class='pagination-number' data-index='#{iter}'): a(href='#') #{1+ iter++}
+                li(class='pagination-next'): a(href='#') >
+    div(class='header-container col s12 m4 l4')
+        div(class='input-field')
+            select(name="categorias")
+section(class='row grid-cards')
+    div(class='row row-cards container-result' data-template="reporte")
+       div(class='col s12 m4 l4 result-item')
+            div(class="card card-report")
+                figure(class="card-image" class='card-report-container-img')
+                    img(src="/photos/url_fotos" class='card-report-img')
+                div(class="card-content")
+                    p: a(href='/#{credencial.nombre}/reportes/::id::/details' data-params='titulo') titulo
