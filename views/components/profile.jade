@@ -58,7 +58,11 @@ block append scripts
     script(src='/javascripts/ciudadano/btn-action-reports.js')
     script.
         paginatorReportes = new Paginator("reporte-list");
-        paginatorReportes.options.url_ajax = "/reporte/persona/"+$("#id_people").val();
+        if($("#id_rol").val() === "ciudadano"){
+            paginatorReportes.options.url_ajax = "/reporte/persona/"+$("#id_people").val();
+        }else{
+            paginatorReportes.options.url_ajax = "/reporte/organizacion/"+$("#id_people").val();
+        }
         paginatorReportes.options.numResultsShow = 12;
         paginatorReportes.obtenerTodos();
         paginatorReportes.renderizarTemplate();

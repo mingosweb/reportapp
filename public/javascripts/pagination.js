@@ -17,7 +17,7 @@ Paginator = function(template){
         url_ajax: '' // cadena con la url donde se hace la peticón
     };
     
-    this.filters = ""; // cadena con objecto con diferentes parametros de busqueda
+    this.filters = []; // cadena con objecto con diferentes parametros de busqueda
     
     this.itemTemplate = {}; // objeto Jquery con el html del template
     
@@ -79,18 +79,17 @@ Paginator.prototype.cargarTemplate = function( ){
 }
 
 Paginator.prototype.actualizarIndice = function(indiceSelect){
-    if( indiceSelect >= 1 && indiceSelect <= parent.options.numPages){
-        parent.options.index = indiceSelect - 1;   
-    }else if(indiceSelect === 1){
-        parent.options.index = 0;   
+    if( indiceSelect >= 0 && indiceSelect < parent.options.numPages){
+        parent.options.index = indiceSelect;   
     }else{
-        parent.options.index = 0;   
+        parent.options.index = parent.options.index;
     }
 };
 
 Paginator.prototype.agregarFiltro = function(campo, valor){
-    obj = {};
-    obj[campo] = valor;
+    obj = { campo: null, valor: null};
+    obj.campo = campo;
+    obj.valor = valor;
     this.filters.push(obj);
 };
 
@@ -115,37 +114,64 @@ Paginator.prototype.obtenerTodos = function(){
     });
 };
 
+Paginator.prototype.actualizarControl = function(){
+    this.controls.find("li.active").removeClass("active");
+    $("[data-index="+this.options.index+"]").addClass("active");
+    
+}
+
 Paginator.prototype.iniciarControles = function(result){
     var parent = this;
     // obtenemos el total de paginas
     if(result !== null){
-        // asignamos el total de paginas a la clase
-        this.options.numPages = Math.ceil(result / this.options.numResultsShow);
-        // borramos las paginas actuales
-        indexTemplate = this.controls.find(".pagination-number:first");
-        indexPrev = this.controls.find(".pagination-prev");
-        indexNext = this.controls.find(".pagination-next");
-        this.controls.empty();
-        this.controls.append(indexPrev);
-        for(var i = 0; i < this.options.numPages; i++){
-            // obtenemos el template de item
-            var tmp = indexTemplate.clone();
-            if(i === this.options.index){
-                tmp.addClass("active");
+        if(result > 0){
+            $(".container-controls").show();
+           // asignamos el total de paginas a la clase
+            this.options.numPages = Math.ceil(result / this.options.numResultsShow);
+            // borramos las paginas actuales
+            indexTemplate = this.controls.find(".pagination-number:first");
+            indexPrev = this.controls.find(".pagination-prev");
+            indexNext = this.controls.find(".pagination-next");
+            this.controls.empty();
+            // programamos el boton de pagina anterior
+            if(result > 1){
+              indexPrev.on("click",function(){
+                  parent.actualizarIndice(parent.options.index-1);
+                  parent.renderizarTemplate();
+                  parent.actualizarControl();
+              });
+              this.controls.append(indexPrev);   
             }
-            tmp.attr("data-index",i);
-            tmp.find("a").html(i+1);
-            //asignamos eventos
-            tmp.on("click",function(i,e){
-                parent.controls.find(".pagination-number.active").removeClass("active");
-                indiceSelect = parseInt($(this).find("a").html());
-                $(this).addClass("active");
-                parent.actualizarIndice(indiceSelect);
-                parent.renderizarTemplate();
-            });
-            this.controls.append(tmp);
+            for(var i = 0; i < this.options.numPages; i++){
+                // obtenemos el template de item
+                var tmp = indexTemplate.clone();
+                if(i === this.options.index){
+                    tmp.addClass("active");
+                }
+                tmp.attr("data-index",i);
+                tmp.find("a").html(i+1);
+                //asignamos eventos
+                tmp.on("click",function(i,e){
+                    parent.controls.find(".pagination-number.active").removeClass("active");
+                    indiceSelect = parseInt($(this).attr("data-index"));
+                    $(this).addClass("active");
+                    parent.actualizarIndice(indiceSelect);
+                    parent.renderizarTemplate();
+                });
+                this.controls.append(tmp);
+            }
+            // programamos el boton de pagina siguiente
+            if(result > 1){
+                indexNext.on("click",function(){
+                    parent.actualizarIndice(parent.options.index+1);
+                    parent.renderizarTemplate();
+                    parent.actualizarControl();
+                });
+              this.controls.append(indexNext);    
+            }
+        }else{
+            $(".container-controls").hide();
         }
-        this.controls.append(indexNext);
     }
 }
 
@@ -154,9 +180,10 @@ Paginator.prototype.renderizarTemplate = function(){
     $(".message-box").hide();
     parent = this;
     console.log("renderizando con indice: "+parent.options.index);
+    body = {limit: this.options.numResultsShow, skip: this.options.index*this.options.numResultsShow};
     $.ajax({
         url: this.options.url_ajax,
-        data: {limit: this.options.numResultsShow, skip: this.options.index*this.options.numResultsShow},
+        data: body,
         dataType: 'json',
         type: 'post',
         success: function(data){

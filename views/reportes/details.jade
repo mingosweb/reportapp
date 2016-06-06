@@ -24,9 +24,9 @@ block content
                             if respuestasIn
                                 div(class='input-field')
                                     select(name="respuesta" id='select-respuesta')
-                                        option(value="") Selecciona una 
+                                        option(value="") selecciona una respuesta
                                             for res in respuestasIn
-                                                option(value="#{res._id}") #{res.message}
+                                                option(value="#{res._id}" class='#{res.autor}') #{res.message}
                         a(id="btn-add-respuesta" class='btn') Enviar respuesta
                 // slider de fotos          
                 div(class='slider-photos')

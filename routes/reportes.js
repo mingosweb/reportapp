@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var Mreporte = require("../model/Reporte");
+var Mrespuesta = require("../model/Respuesta");
 
 router.post('/list/:ciudad', function(req, res, next) {
     if(req.session.credencial){
@@ -98,21 +99,47 @@ router.post('/list-word/:palabra', function(req, res, next) {
 
 router.post('/persona/:id',function(req, res, next){
    if(req.session.credencial){
-       console.log(req.session.credencial);
+       myquery =  reporteMod.find({'autor': req.params.id }).populate({path: "respuestas", select: "autor", populate: "autor"}).sort({'timestamp': 'desc'});
+       myquery.exec(function(err,reps){
+           if(err){
+               res.json({status: "ERROR", message: "Ocurrio un error al hacer la consulta"});
+           }else{
+               res.json({status: "OK",rol: "ciudadano", message: reps, id: req.params.id});
+           }
+       });
+   } else{
+       res.json({status: 'ERROR', message: "INVALID"});
+   }
+});
+
+router.post('/organizacion/:id',function(req, res, next){
+   if(req.session.credencial){
         // preparamos los parametros de la query
        if(!req.params.id.empty){
-           params = {$or: [{'autor': req.params.id },{ 'respuestas.autor': req.params.id }]};
-           console.log(params);
-           query =  reporteMod.find(params).populate({path: "respuestas", select: "autor", populate: "autor"}).sort({'timestamp': 'desc'});
-           query.exec(function(err,reps){
+           respuestaMod = Mrespuesta.RespuestaModel;
+           query =respuestaMod.find({autor: req.params.id},{autor:1}).populate({path: 'autor', select:'nombre'});
+           query.exec(function(err,resp){
+               resp = resp.map(function(re){
+                   return re._id;
+               });
                if(err){
-                   res.json({status: "ERROR", message: "Ocurrio un error al hacer la consulta"});
+                   res.json({status: "ERROR", message: "Error en consulta de espuestas"});
                }else{
-                   res.json({status: "OK", message: reps});
+                   // buscar las respuestas con id de las respuestas de la organizacion
+                   reporteMod = Mreporte.ReporteModel;
+                   queryReps = reporteMod.find({respuestas: {$in: resp}});
+                   queryReps.exec(function(err,reports){
+                       if(err){
+                         res.json({status:"ERROR", message: "Error consultando reportes"});  
+                       }else{
+                         res.json({status: "OK", message:reports});
+                       }
+                   });
                }
            });
-       }
-   } else{
+        }
+    }
+    else{
        res.json({status: 'ERROR', message: "INVALID"});
    }
 });
