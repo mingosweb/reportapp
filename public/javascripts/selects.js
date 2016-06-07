@@ -78,7 +78,17 @@ if($("#btn-add-respuesta").length > 0){
                 dataType: 'json',
                 success: function(data){
                     if(data.status === "OK"){
-                        alert(data.message);
+                        $('#modal-respuesta').closeModal();
+                        div= $("<div class='result-item respuesta'></div>");
+                        div_img = $("<div class='respuesta-img'></div>");
+                        img = $("<img src='/images/avatar-organizacion.png'/>");
+                        div_contenido = $("<div class='respuesta-contenido'><p>"+data.message.message+"</p></div>");
+                        div_img.append(img);
+                        div.append(div_img);
+                        div.append(div_contenido);
+                        if($(".container-result[data-template=respuesta]").length > 0){
+                            $(".container-result[data-template=respuesta]").find(".element-panel").append(div);
+                        }
                     }else{
                         alert("Ocurrio un error al realizar la operacion");
                     }

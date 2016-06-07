@@ -173,7 +173,19 @@ router.post('/agregar-respuesta',function(req, res, next){
             if(err){
                 res.json({status: "ERROR", message: "Erro en la consulta"});
             }else{
-                res.json({status: "OK", message: rep});
+                console.log("REPORTE");
+                console.log(rep);
+                respuestaMod = Mrespuesta.RespuestaModel;
+                query = respuestaMod.findOne({_id: req.body.respuesta});
+                query.exec(function(err,resp){
+                    if(err){
+                        res.json({status: "ERROR", message: "ha ocurrido un error al encontrar respuesta"});
+                    }else{
+                        console.log("RESPUESTA");
+                        console.log(resp);
+                        res.json({status: "OK", message: resp});
+                    }
+                });
             }
         });
     }else{
