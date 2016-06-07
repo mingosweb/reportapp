@@ -7,27 +7,32 @@ block content
                 div(class='grid-column grid-panel')
                     h4(class='title-small') Encuentra tus notificaciones
                     div(class="input-field col s12")
-                            input(type="text" data-url='' placeholder='Ingresa una palabra clave' required)
-                            label(for="search-peoples" id='label-peoples')
+                        if(credencial.rol === "ciudadano")
+                            input(type="text" data-url='/notificacion/ciudadano/list-word/::key::' class='search-pagination' placeholder='Ingresa una palabra clave' required)
+                        else
+                            input(type="text" data-url='/notificacion/organizacion/list-word/::key::' class='search-pagination' placeholder='Ingresa una palabra clave' required)
                     figure(class='align-center hide-on-med-and-down')
                         img(src='/images/search-reports.png' class='responsive-img')
             div(class='col m7 l8 s12')
                 div(class='grid-column grid-panel')
                         div(class='message-box')
                             h4.title-small Encuentra los sucesos que ocurren en reportar.co mas rapido. ingresa una palabra y listo!
-                        header(class='row header-section container-controls')
-                            div(class='header-container col s12 m4 l4')
-                                    ul(class='pagination center' data-template='reporte-list')
-                                        li(class='pagination-prev waves-efect'): a(href='#') <
-                                        li(class='pagination-number' data-index='#{iter}'): a(href='#') #{1+ iter++}
-                                        li(class='pagination-next'): a(href='#') >
-                        div(class='header-container col s12 m4 l4')
-                            div(class='input-field')
-                                select(name="categorias")
-                                    option(value="categoria 1") Ciudadanos
-                                    option(value="categoria 2") Organizacion
-                        div(class='container-results' data-type='peoples')
+                        header(class='header-section row')
+                            div(class='header-container container-controls col s12 m12 l12')
+                                ul(class='pagination center' data-template="notificacion")
+                                    li(class='waves-efect pagination-prev'): a(href='#') <
+                                    li(class='waves-efect pagination-number'): a(href='#') 1
+                                    li(class='pagination-next'): a(href='#') >
+                        div(class='row container-result' data-template="notificacion")
+                            div(class='report-list result-item')
+                                div(class='grid-row')
+                                    div(class='report-list-col-information')
+                                        h3(class='title-mini'): a(href='/#{credencial.nombre}/reportes/::reporte::/details' data-params='titulo') titulo
+                                        p(data-params='descripcion') descripcion
+                                        small(data-params='lapsoDeTiempo') lapsoDeTiempo
                             // results here
 block append scripts
     script(src='/javascripts/pagination.js')
+    script.
+        template = "notificacion"
     script(src='/javascripts/search-peoples.js')

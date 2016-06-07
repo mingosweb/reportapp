@@ -61,4 +61,11 @@ socket.on('recibir', function(socketData){
     setTimeout(function(){
         Materialize.toast($toastContent, 3000);
     },500);
+    if($(".container-result[data-template=reporte]")){
+        paginatorReportes = new Paginator("reporte");
+        paginatorReportes.options.url_ajax = "/reporte/list/"+localStorage.getItem("ciudad");
+        paginatorReportes.options.numResultsShow = 12;
+        paginatorReportes.obtenerTodos();
+        paginatorReportes.renderizarTemplate();
+    }
 });
