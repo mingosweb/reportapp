@@ -97,6 +97,6 @@ app.use(function(err, req, res, next) {
   });
 });
 
-server.listen(3000, function () {
+server.listen(80, function () {
   //console.log('Example app listening on port 3000!');
 });
