@@ -376,7 +376,7 @@ router.get('/:email/personas', function(req, res, next){
        res.render('components/reporters',{
                                 credencial: {passport: req.session.credencial, nombre: req.session.nombre, rol: req.session.rol}, 
                                 opciones: utilities.menuPersonas(req.session.nombre, req.session.rol),
-                                activeHeader: 'notificaciones'
+                                activeHeader: 'personas'
                               }); 
     }else{
         res.redirect('/');
